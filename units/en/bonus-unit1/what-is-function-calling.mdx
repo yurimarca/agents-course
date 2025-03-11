@@ -4,7 +4,7 @@ Function-calling is a **way for an LLM to take actions on its environment**. It 
 
 Just like the tools of an Agent, function-calling gives the model the capacity to **take an action on its environment**. However, the function calling capacity **is learned by the model**, and relies **less on prompting than other agents techniques**.
 
-During the Unit 1, the Agent **didn't learn to use the Tools**, we just provided the list, and we relied on the fact that the model **was able to generalize on defining a plan using these Tools**. 
+During Unit 1, the Agent **didn't learn to use the Tools**, we just provided the list, and we relied on the fact that the model **was able to generalize on defining a plan using these Tools**. 
 
 While here, **with function-calling, the Agent is fine-tuned (trained) to use Tools**.
 
@@ -59,7 +59,7 @@ conversation = [
 ]
 ```
 
-> ... But you said there's a new role for function calls ?
+> ... But you said there's a new role for function calls?
 
 **Yes and no**, in this case and in a lot of other APIs, the model formats the action to take as an "assistant" message. The chat template will then represent this as **special tokens** for function-calling.
 
