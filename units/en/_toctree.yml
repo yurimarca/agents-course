@@ -54,6 +54,8 @@
     title: Conclusion
 - title: Unit 3. Use Case for Agentic RAG
   sections:
+  - local: unit3/agentic-rag/introduction
+    title: Introduction
   - local: unit3/agentic-rag/gala.mdx
     title: A Gala to Remember 
   - local: unit3/agentic-rag/agentic-rag.mdx
