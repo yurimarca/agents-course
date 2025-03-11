@@ -64,8 +64,6 @@
     title: Give your agent a database
   - local: unit3/agentic-rag/tools.mdx
     title: Creating a Weather Tool
-  - local: unit3/agentic-rag/memory.mdx
-    title: Give your agent a memory
   - local: unit3/agentic-rag/agent.mdx
     title: Putting your agent to the test
   - local: unit3/agentic-rag/conclusion.mdx
