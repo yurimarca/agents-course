@@ -106,7 +106,7 @@ class GuestInfoRetrieverTool(Tool):
             return "No matching guest information found."
 
 # Initialize the tool
-guest_info_tool = GuestInfoRetrieverTool(docs_processed)
+guest_info_tool = GuestInfoRetrieverTool(docs)
 ```
 
 Let's understand this tool. 
@@ -170,6 +170,6 @@ Now Alfred is fully equipped to handle guest inquiries effortlessly, ensuring yo
 <Exercise>
 Try extending the `GuestInfoRetrieverTool` to also return conversation starters based on each guest's interests or background. How would you modify the tool to accomplish this?
 
-When you're done, implent your guest retriever tool in the `retriever.py` file.
+When you're done, implement your guest retriever tool in the `retriever.py` file.
 </Exercise>
 
