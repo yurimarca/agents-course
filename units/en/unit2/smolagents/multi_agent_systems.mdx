@@ -262,7 +262,6 @@ from smolagents import OpenAIServerModel
 
 
 def check_reasoning_and_plot(final_answer, agent_memory):
-    final_answer
     multimodal_model = OpenAIServerModel("gpt-4o", max_tokens=8096)
     filepath = "saved_map.png"
     assert os.path.exists(filepath), "Make sure to save the plot under saved_map.png!"
