@@ -4,7 +4,7 @@ To build agents with LangGraph, you need to understand its core components. Let'
 
 <img src="https://huggingface.co/datasets/agents-course/course-images/resolve/main/en/unit2/LangGraph/Building_blocks.png" alt="Building Blocks" width="70%"/>
 
-An application in LangGraph starts from an **entrypoint** and depending on the execution happening the flow may go to a function or another untill it reach the END.
+An application in LangGraph starts from an **entrypoint**, and depending on the execution, the flow may go to one function or another until it reaches the END.
 
 <img src="https://huggingface.co/datasets/agents-course/course-images/resolve/main/en/unit2/LangGraph/application.png" alt="Application"/>
 
@@ -44,7 +44,7 @@ def node_3(state):
     return {"graph_state": state['graph_state'] +" sad!"}
 ```
 
-For example Nodes can contain:
+For example, Nodes can contain:
 - **LLM calls**: Generate text or make decisions
 - **Tool calls**: Interact with external systems
 - **Conditional logic**: Determine next steps
@@ -124,4 +124,4 @@ output :
 
 ## What's Next?
 
-In the next section, we'll put these concepts into practice by building our first graph. This graph lets Alphred take in your e-mail, classify them and craft a preliminary answer if they are genuine.
+In the next section, we'll put these concepts into practice by building our first graph. This graph lets Alfred take in your e-mails, classify them, and craft a preliminary answer if they are genuine.
