@@ -105,6 +105,7 @@
   - local: unit2/langgraph/quiz1
     title: Quick Quiz 1
   - local: unit2/langgraph/conclusion
+    title: Conclusion
 - title: Bonus Unit 1. Fine-tuning an LLM for Function-calling
   sections:
   - local: bonus-unit1/introduction
