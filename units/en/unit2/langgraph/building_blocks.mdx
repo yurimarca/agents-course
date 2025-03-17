@@ -1,0 +1,92 @@
+# Building Blocks of LangGraph
+
+To build agents with LangGraph, you need to understand its core components. Let's explore the fundamental building blocks that make up a LangGraph application.
+
+<img src="https://huggingface.co/datasets/agents-course/course-images/resolve/main/en/unit2/LangGraph/Building_blocks.png" alt="Building Blocks"/>
+
+An application in LangGraph starts from an **entrypoint** and depending on the execution happening the flow may go to a function or another untill it reach the END.
+
+<img src="https://huggingface.co/datasets/agents-course/course-images/resolve/main/en/unit2/LangGraph/application.png" alt="Application"/>
+
+## 1. State
+
+**State** is the central concept in LangGraph. It represents all the information that flows through your agent application. 
+
+```python
+from typing import TypedDict, List, Dict, Any
+
+# Define your state schema
+class AgentState(TypedDict):
+    messages: List[Dict[str, Any]]
+    current_step: str
+```
+
+The state is **User defined**, hence the fields should carefully be crafter to contain all data needed for decision-making process!
+
+> 💡 **Tip:** Think carefully about what information your agent needs to track between steps.
+
+## 2. Nodes
+
+**Nodes** are python functions. Each node:
+- Takes the state as input
+- Performs some operation
+- Returns updates to the state
+
+```python
+# Simple node function
+def retrieve_documents(state: AgentState):
+    query = state["messages"][-1]["content"]
+    # Logic to retrieve documents
+    return {"documents": retrieved_docs}
+
+# Add to graph
+graph.add_node("retrieve", retrieve_documents)
+```
+
+For example Nodes can contain:
+- **LLM calls**: Generate text or make decisions
+- **Tool calls**: Interact with external systems
+- **Conditional logic**: Determine next steps
+- **Human intervention**: Get input from users
+
+> 💡 **Info:** Some nodes necessary for the whole workflow like START and END exist from langGraph directly. 
+
+
+## 3. Edges
+
+**Edges** connect nodes and define the possible paths through your graph:
+
+```python
+# Simple linear connection
+graph.add_edge("retrieve", "generate_answer")
+
+# Conditional branching
+graph.add_conditional_edges(
+    "analyze_question",
+    decide_next_step,  # Function that returns the next node name
+    {
+        "need_search": "search_web",
+        "need_calculation": "calculator",
+        "ready_to_answer": "generate_answer"
+    }
+)
+```
+
+Edges can be:
+- **Direct**: Always go from node A to node B
+- **Conditional**: Choose the next node based on the current state
+
+## 4. StateGraph
+
+The **StateGraph** is the container that holds your entire agent workflow:
+
+```python
+from langgraph.graph import StateGraph
+
+# Create a graph with your state type
+graph = StateGraph(AgentState)
+```
+
+## What's Next?
+
+In the next section, we'll put these concepts into practice by building our first graph. This graph lets Alphred take in your e-mail, classify them and craft a preliminary answer if they are genuine.

@@ -1,0 +1,107 @@
+# Test Your Understanding of LangGraph
+
+Let's test your understanding of `LangGraph` with a quick quiz! This will help reinforce the key concepts we've covered so far.
+
+This is an optional quiz and it's not graded.
+
+### Q1: What is the primary purpose of LangGraph?
+Which statement best describes what LangGraph is designed for?
+
+<Question
+choices={[
+  {
+    text: "A framework to build control flows for applications containing LLMs",
+    explain: "Correct! LangGraph is specifically designed to help build and manage the control flow of applications that use LLMs.",
+    correct: true
+  },
+  {
+    text: "A library that provides interfaces to interact with different LLM models",
+    explain: "This better describes LangChain's role, which provides standard interfaces for model interaction. LangGraph focuses on control flow.",
+  },
+  {
+    text: "A tool for optimizing prompt engineering techniques",
+    explain: "While LangGraph works with LLMs that use prompts, its primary purpose is managing control flow, not prompt engineering.",
+  },
+  {
+    text: "A system for automatically generating Python code from natural language",
+    explain: "LangGraph is not primarily a code generation tool, but rather a framework for orchestrating the flow of LLM applications.",
+  }
+]}
+/>
+
+---
+
+### Q2: In the context of the "Control vs Freedom" trade-off, where does LangGraph stand?
+Which statement best characterizes LangGraph's approach to agent design?
+
+<Question
+choices={[
+  {
+    text: "LangGraph maximizes freedom, allowing LLMs to make all decisions independently",
+    explain: "LangGraph actually focuses more on control than freedom, providing structure for LLM workflows.",
+  },
+  {
+    text: "LangGraph provides strong control over execution flow while still leveraging LLM capabilities",
+    explain: "Correct! LangGraph shines when you need control over your agent's execution, providing predictable behavior through structured workflows.",
+    correct: true
+  },
+]}
+/>
+
+---
+
+### Q3: What role does State play in LangGraph?
+Choose the most accurate description of State in LangGraph.
+
+<Question
+choices={[
+  {
+    text: "State is automatically generated and cannot be modified by the developer",
+    explain: "State is user-defined in LangGraph, not automatically generated.",
+  },
+  {
+    text: "State is only used to track errors during execution",
+    explain: "State has a much broader purpose than just error tracking.",
+  },
+  {
+    text: "State represents all the information that flows through your agent application",
+    explain: "Correct! State is central to LangGraph and contains all the information needed for decision-making between steps.",
+    correct: true
+  },
+  {
+    text: "State is only relevant when working with external APIs",
+    explain: "State is fundamental to all LangGraph applications, not just those working with external APIs.",
+  }
+]}
+/>
+
+---
+
+### Q4: When should you choose to use LangGraph for an application?
+In which scenario is LangGraph most appropriate?
+
+<Question
+choices={[
+  {
+    text: "When you need to build a simple chatbot",
+    explain: "Very simple applications might not benefit from LangGraph's structured approach.",
+  },
+  {
+    text: "When creating a multi-step workflow where the execution path depends on previous results",
+    explain: "Correct! LangGraph excels at orchestrating complex workflows with conditional paths based on state.",
+    correct: true
+  },
+  {
+    text: "When you need to make an LLM call an API",
+    explain: "For simple, linear flows with a single LLM call, LangGraph might be unnecessarily complex.",
+  },
+  {
+    text: "When you want to avoid using any LLM capabilities in your application",
+    explain: "LangGraph is specifically designed for applications that incorporate LLMs.",
+  }
+]}
+/>
+
+---
+
+Congratulations on completing the quiz! 🎉 If you missed any questions, consider reviewing the previous sections to strengthen your understanding. Next, we'll explore more advanced features of LangGraph and see how to build more complex agent workflows.
