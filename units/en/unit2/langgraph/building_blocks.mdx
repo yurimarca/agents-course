@@ -2,7 +2,7 @@
 
 To build agents with LangGraph, you need to understand its core components. Let's explore the fundamental building blocks that make up a LangGraph application.
 
-<img src="https://huggingface.co/datasets/agents-course/course-images/resolve/main/en/unit2/LangGraph/Building_blocks.png" alt="Building Blocks"/>
+<img src="https://huggingface.co/datasets/agents-course/course-images/resolve/main/en/unit2/LangGraph/Building_blocks.png" alt="Building Blocks" width="70%"/>
 
 An application in LangGraph starts from an **entrypoint** and depending on the execution happening the flow may go to a function or another untill it reach the END.
 
@@ -13,12 +13,10 @@ An application in LangGraph starts from an **entrypoint** and depending on the e
 **State** is the central concept in LangGraph. It represents all the information that flows through your agent application. 
 
 ```python
-from typing import TypedDict, List, Dict, Any
+from typing_extensions import TypedDict
 
-# Define your state schema
-class AgentState(TypedDict):
-    messages: List[Dict[str, Any]]
-    current_step: str
+class State(TypedDict):
+    graph_state: str
 ```
 
 The state is **User defined**, hence the fields should carefully be crafter to contain all data needed for decision-making process!
@@ -33,14 +31,17 @@ The state is **User defined**, hence the fields should carefully be crafter to c
 - Returns updates to the state
 
 ```python
-# Simple node function
-def retrieve_documents(state: AgentState):
-    query = state["messages"][-1]["content"]
-    # Logic to retrieve documents
-    return {"documents": retrieved_docs}
+def node_1(state):
+    print("---Node 1---")
+    return {"graph_state": state['graph_state'] +" I am"}
 
-# Add to graph
-graph.add_node("retrieve", retrieve_documents)
+def node_2(state):
+    print("---Node 2---")
+    return {"graph_state": state['graph_state'] +" happy!"}
+
+def node_3(state):
+    print("---Node 3---")
+    return {"graph_state": state['graph_state'] +" sad!"}
 ```
 
 For example Nodes can contain:
@@ -57,19 +58,22 @@ For example Nodes can contain:
 **Edges** connect nodes and define the possible paths through your graph:
 
 ```python
-# Simple linear connection
-graph.add_edge("retrieve", "generate_answer")
+import random
+from typing import Literal
 
-# Conditional branching
-graph.add_conditional_edges(
-    "analyze_question",
-    decide_next_step,  # Function that returns the next node name
-    {
-        "need_search": "search_web",
-        "need_calculation": "calculator",
-        "ready_to_answer": "generate_answer"
-    }
-)
+def decide_mood(state) -> Literal["node_2", "node_3"]:
+    
+    # Often, we will use state to decide on the next node to visit
+    user_input = state['graph_state'] 
+    
+    # Here, let's just do a 50 / 50 split between nodes 2, 3
+    if random.random() < 0.5:
+
+        # 50% of the time, we return Node 2
+        return "node_2"
+    
+    # 50% of the time, we return Node 3
+    return "node_3"
 ```
 
 Edges can be:
@@ -81,10 +85,40 @@ Edges can be:
 The **StateGraph** is the container that holds your entire agent workflow:
 
 ```python
-from langgraph.graph import StateGraph
+from IPython.display import Image, display
+from langgraph.graph import StateGraph, START, END
 
-# Create a graph with your state type
-graph = StateGraph(AgentState)
+# Build graph
+builder = StateGraph(State)
+builder.add_node("node_1", node_1)
+builder.add_node("node_2", node_2)
+builder.add_node("node_3", node_3)
+
+# Logic
+builder.add_edge(START, "node_1")
+builder.add_conditional_edges("node_1", decide_mood)
+builder.add_edge("node_2", END)
+builder.add_edge("node_3", END)
+
+# Add
+graph = builder.compile()
+```
+
+Which can then be visualized ! 
+```python
+# View
+display(Image(graph.get_graph().draw_mermaid_png()))
+```
+
+But most importantly, invoked :
+```python
+graph.invoke({"graph_state" : "Hi, this is Lance."})
+```
+output :
+```
+---Node 1---
+---Node 3---
+{'graph_state': 'Hi, this is Lance. I am sad!'}
 ```
 
 ## What's Next?
