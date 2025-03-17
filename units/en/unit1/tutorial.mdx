@@ -40,6 +40,14 @@ To start, duplicate this Space: <a href="https://huggingface.co/spaces/agents-co
 Duplicating this space means **creating a local copy on your own profile**:
 <img src="https://huggingface.co/datasets/agents-course/course-images/resolve/main/en/unit1/duplicate-space.gif" alt="Duplicate"/>
 
+After duplicating the Space, you'll need to add your Hugging Face API token so your agent can access the model API:
+
+1. First, get your Hugging Face token from [https://hf.co/settings/tokens](https://hf.co/settings/tokens) with permission for inference, if you don't already have one
+2. Go to your duplicated Space and click on the **Settings** tab
+3. Scroll down to the **Variables and Secrets** section and click **New Secret**
+4. Create a secret with the name `HF_TOKEN` and paste your token as the value
+5. Click **Save** to store your token securely
+
 Throughout this lesson, the only file you will need to modify is the (currently incomplete) **"app.py"**. You can see here the [original one in the template](https://huggingface.co/spaces/agents-course/First_agent_template/blob/main/app.py). To find yours, go to your copy of the space, then click the `Files` tab and then on `app.py` in the directory listing.
 
 Let's break down the code together:
@@ -47,12 +55,11 @@ Let's break down the code together:
 - The file begins with some simple but necessary library imports
 
 ```python
-from smolagents import CodeAgent, DuckDuckGoSearchTool, HfApiModel, load_tool, tool
+from smolagents import CodeAgent, DuckDuckGoSearchTool, FinalAnswerTool, HfApiModel, load_tool, tool
 import datetime
 import requests
 import pytz
 import yaml
-from tools.final_answer import FinalAnswerTool
 ```
 
 As outlined earlier, we will directly use the **CodeAgent** class from **smolagents**.
@@ -140,6 +147,14 @@ For example, you could use the `DuckDuckGoSearchTool` that was imported in the f
 
 **Adding tools will give your agent new capabilities**, try to be creative here!
 
+### The System Prompt
+
+The agent's system prompt is stored in a seperate `prompts.yaml` file. This file contains predefined instructions that guide the agent's behavior.
+
+Storing prompts in a YAML file allows for easy customization and reuse across different agents or use cases. 
+
+You can check the [Space's file structure](https://huggingface.co/spaces/agents-course/First_agent_template/tree/main) to see where the `prompts.yaml` file is located and how it's organized within the project.
+
 The complete "app.py": 
 
 ```python
@@ -180,17 +195,18 @@ def get_current_time_in_timezone(timezone: str) -> str:
 
 
 final_answer = FinalAnswerTool()
-model = HfApiModel(
-max_tokens=2096,
-temperature=0.5,
-model_id='Qwen/Qwen2.5-Coder-32B-Instruct',
-custom_role_conversions=None,
+    model = HfApiModel(
+    max_tokens=2096,
+    temperature=0.5,
+    model_id='Qwen/Qwen2.5-Coder-32B-Instruct',
+    custom_role_conversions=None,
 )
 
 
 # Import tool from Hub
 image_generation_tool = load_tool("agents-course/text-to-image", trust_remote_code=True)
 
+# Load system prompt from prompt.yaml file
 with open("prompts.yaml", 'r') as stream:
     prompt_templates = yaml.safe_load(stream)
     
@@ -203,14 +219,14 @@ agent = CodeAgent(
     planning_interval=None,
     name=None,
     description=None,
-    prompt_templates=prompt_templates
+    prompt_templates=prompt_templates # Pass system prompt to CodeAgent
 )
 
 
 GradioUI(agent).launch()
 ```
 
-Your **Goal** is to get familiar with the Space and the Agent. 
+Your **Goal** is to get familiar with the Space and the Agent.
 
 Currently, the agent in the template **does not use any tools, so try to provide it with some of the pre-made ones or even make some new tools yourself!**
 
