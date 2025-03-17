@@ -72,7 +72,7 @@
     title: Final Quiz
   - local: unit2/smolagents/conclusion
     title: Conclusion
-- title: Unit 2.3: LangGraph
+- title: Unit 2.3 LangGraph
   sections:
   - local: unit2/langgraph/introduction
     title: Introduction to LangGraph
@@ -81,7 +81,7 @@
   - local: unit2/langgraph/building_blocks
     title: The building blocks of LangGraph
   - local: unit2/langgraph/first_graph
-    title: Your first LangGraph : SPAM or HAM ?
+    title: Your first LangGraph, SPAM or HAM ?
   - local: unit2/langgraph/quiz1
     title: Quick Quiz 1
   - local: unit2/langgraph/conclusion
