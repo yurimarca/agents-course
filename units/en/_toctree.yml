@@ -72,6 +72,20 @@
     title: Final Quiz
   - local: unit2/smolagents/conclusion
     title: Conclusion
+- title: Unit 2.3: LangGraph
+  sections:
+  - local: unit2/langgraph/introduction
+    title: Introduction to LangGraph
+  - local: unit2/langgraph/when_to_use_langgraph
+    title: When to use LangGraph ?
+  - local: unit2/langgraph/building_blocks
+    title: The building blocks of LangGraph
+  - local: unit2/langgraph/first_graph
+    title: Your first LangGraph : SPAM or HAM ?
+  - local: unit2/langgraph/quiz1
+    title: Quick Quiz 1
+  - local: unit2/langgraph/conclusion
+    title: Conclusion
 - title: Bonus Unit 1. Fine-tuning an LLM for Function-calling
   sections:
   - local: bonus-unit1/introduction
