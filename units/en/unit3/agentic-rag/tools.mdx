@@ -17,10 +17,13 @@ from smolagents import DuckDuckGoSearchTool
 search_tool = DuckDuckGoSearchTool()
 
 # Example usage
-results = search_tool("Who's the current president of France?")
+results = search_tool("Who's the current President of France?")
 print(results)
 ```
-
+Expected output:
+```python
+The current President of France in Emanual Macron.
+```
 ## Creating a Custom Tool for Weather Information to Schedule the Fireworks
 
 Remember that we need to make sure the fireworks are not cancelled due to bad weather?
@@ -99,7 +102,11 @@ hub_stats_tool = HubStatsTool()
 # Example usage
 print(hub_stats_tool("facebook"))  # Example: Get the most downloaded model by Facebook
 ```
+Expected output:
 
+```Python
+The most downloaded model by facebook is facebook/esmfold_v1 with 12.195.721 downloads."
+```
 With the Hub Stats Tool, Alfred can now impress influential AI builders by discussing their most popular models.
 
 ## Integrating Tools with Alfred
@@ -123,6 +130,13 @@ response = alfred.run("Who is Meta AI and what's their most popular model?")
 
 print("🎩 Alfred's Response:")
 print(response)
+```
+
+Expected output: 
+```python
+🎩 Alfred's Response:
+Meta or previously facebook is an American multinational technology conglomerate.
+The most downloaded model by facebook is facebook/esmfold_v1 with 12.195.721 downloads.
 ```
 
 ## Conclusion
