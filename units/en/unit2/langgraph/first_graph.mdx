@@ -332,9 +332,9 @@ _[Public link to the trace with the legit email](https://cloud.langfuse.com/proj
 LangGraph allows us to visualize our workflow to better understand and debug its structure:
 
 ```python
-# Save and display the graph
-email_graph.to_graph().draw("alfred_email_graph.png")
+compiled_graph.get_graph().draw_mermaid_png()
 ```
+<img src="https://huggingface.co/datasets/agents-course/course-images/resolve/main/en/unit2/LangGraph/mail_flow.png" alt="Mail LangGraph"/>
 
 This produces a visual representation showing how our nodes are connected and the conditional paths that can be taken.
 
