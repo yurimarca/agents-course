@@ -104,14 +104,14 @@ builder.add_edge("node_3", END)
 graph = builder.compile()
 ```
 
-Which can then be visualized ! 
+Which can then be visualized! 
 ```python
 # View
 display(Image(graph.get_graph().draw_mermaid_png()))
 ```
 <img src="https://huggingface.co/datasets/agents-course/course-images/resolve/main/en/unit2/LangGraph/basic_graph.jpeg" alt="Graph Visualization"/>
 
-But most importantly, invoked :
+But most importantly, invoked:
 ```python
 graph.invoke({"graph_state" : "Hi, this is Lance."})
 ```

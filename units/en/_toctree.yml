@@ -97,13 +97,13 @@
   - local: unit2/langgraph/introduction
     title: Introduction to LangGraph
   - local: unit2/langgraph/when_to_use_langgraph
-    title: When to use LangGraph ?
+    title: What is LangGraph?
   - local: unit2/langgraph/building_blocks
-    title: The building blocks of LangGraph
+    title: Building Blocks of LangGraph
   - local: unit2/langgraph/first_graph
-    title: Your first LangGraph, SPAM or HAM ?
+    title: Building Your First LangGraph
   - local: unit2/langgraph/document_analysis_agent
-    title: Document Analysis Agent with LangGraph
+    title: Document Analysis Graph
   - local: unit2/langgraph/quiz1
     title: Quick Quiz 1
   - local: unit2/langgraph/conclusion

@@ -1,15 +1,15 @@
-## What is `LangGraph`?
+# What is `LangGraph`?
 
 `LangGraph` is a framework developed by [LangChain](https://www.langchain.com/) **to manage the control flow of applications that integrate an LLM**.
 
-## Is `LangGraph` different from `LangChain` ?
+## Is `LangGraph` different from `LangChain`?
 
 LangChain provides a standard interface to interact with models and other components, useful for retrieval, LLM calls and tools calls.
-The classes from LangChain might be used in LangGraph, but does not HAVE to be used. 
+The classes from LangChain might be used in LangGraph, but do not HAVE to be used. 
 
 The packages are different and can be used in isolation, but, in the end, all ressources you will find online use both packages hand in hand.
 
-## When should I use `LangGraph` ?
+## When should I use `LangGraph`?
 ### Control vs freedom
 
 When designing AI applications, you face a fundamental trade-off between **control** and **freedom**:
@@ -17,7 +17,7 @@ When designing AI applications, you face a fundamental trade-off between **contr
 - **Freedom** gives your LLM more room to be creative and tackle unexpected problems.
 - **Control** allows you to ensure predictable behavior and maintain guardrails.
 
-Code Agents like the ones you can encounter in *smolagents* are very free, they can call multiples tools in a single action step, they can create their own tools, etc ... But this behaviour can make them less predictable and less controlable than a regular Agent working with JSON !
+Code Agents, like the ones you can encounter in *smolagents*, are very free. They can call multiple tools in a single action step, create their own tools, etc. However, this behavior can make them less predictable and less controllable than a regular Agent working with JSON!
 
 `LangGraph` is on the other end of the spectrum, it shines when you need **"Control"** on the execution of your agent. 
 
@@ -45,9 +45,9 @@ The key scenarios where LangGraph excels include:
 - **Workflows that need human-in-the-loop interventions**
 - **Complex agent architectures** with multiple components working together
 
-In essence, whenever you can, **as a Human** design a flow of actions that needs to be taken, and that, depending on the output of that one action, decide what you should execute next. Then LangGraph is the correct framework for you !
+In essence, whenever possible, **as a human**, design a flow of actions based on the output of each action, and decide what to execute next accordingly. In this case, LangGraph is the correct framework for you!
 
-`LangGraph`, is, in my own opinion the most production ready agent framework on the market.
+`LangGraph` is, in my opinion, the most production-ready agent framework on the market.
 
 ## How does LangGraph work?
 
@@ -57,9 +57,9 @@ At its core, `LangGraph` uses a directed graph structure to define the flow of y
 - **Edges** define the possible transitions between steps.
 - **State** is user defined and maintained and passed between nodes during execution. When deciding which node to target next, this is the current state that we look at.
 
-We will explore those fundamental blocks more in the next chapter ! 
+We will explore those fundamental blocks more in the next chapter! 
 
-## How is it different from regular python ? Why do I need LangGraph ?
+## How is it different from regular python? Why do I need LangGraph?
 
 You might wonder: "I could just write regular Python code with if-else statements to handle all these flows, right?" 
 
