@@ -95,17 +95,17 @@
 - title: Unit 3. Use Case for Agentic RAG
   sections:
   - local: unit3/agentic-rag/introduction
-    title: Introduction
+    title: Introduction to Use Case for Agentic RAG
   - local: unit3/agentic-rag/gala
-    title: A Gala to Remember 
+    title: A Gala to Remember
   - local: unit3/agentic-rag/agentic-rag
     title: Agentic Retrieval Augmented Generation (RAG)
   - local: unit3/agentic-rag/invitees
-    title: Give your agent a database
+    title: Creating a RAG Tool for Guest Stories
   - local: unit3/agentic-rag/tools
-    title: Creating a Weather Tool
+    title: Building and Integrating Tools for Your Agent
   - local: unit3/agentic-rag/agent
-    title: Putting your agent to the test
+    title: Creating Your Gala Agent
   - local: unit3/agentic-rag/conclusion
     title: Conclusion
 - title: Bonus Unit 1. Fine-tuning an LLM for Function-calling
