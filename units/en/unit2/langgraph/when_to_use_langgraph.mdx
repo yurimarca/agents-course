@@ -1,6 +1,6 @@
 ## What is `LangGraph`?
 
-`LangGraph` is a framework developed by [LangChain](https://www.langchain.com/) to manage the control flow of applications that integrate an LLM.
+`LangGraph` is a framework developed by [LangChain](https://www.langchain.com/) **to manage the control flow of applications that integrate an LLM**.
 
 ## Is `LangGraph` different from `LangChain` ?
 
@@ -17,15 +17,15 @@ When designing AI applications, you face a fundamental trade-off between **contr
 - **Freedom** gives your LLM more room to be creative and tackle unexpected problems.
 - **Control** allows you to ensure predictable behavior and maintain guardrails.
 
-Code Agents like the ones you can encounter in smolagents are very free, they can call multiples tools in a single action step, they can create their own tools, etc ... But this behaviour can make them less predictable and less controlable than a regular Agent working with JSON !
+Code Agents like the ones you can encounter in *smolagents* are very free, they can call multiples tools in a single action step, they can create their own tools, etc ... But this behaviour can make them less predictable and less controlable than a regular Agent working with JSON !
 
 `LangGraph` is on the other end of the spectrum, it shines when you need **"Control"** on the execution of your agent. 
 
 LangGraph is particularly valuable when you need **Control over your agent applications**. It gives you the tools to build an agent application that follows a predictable process while still leveraging the power of LLMs. 
 
-Put simply, if your application involves a series of steps that need to be orchestrated in a specific way, with decisions being made at each junction point, LangGraph provides the structure you need.
+Put simply, if your application involves a series of steps that need to be orchestrated in a specific way, with decisions being made at each junction point, **LangGraph provides the structure you need**.
 
-As an example, let's say we want to build an LLM assistant that can answer some question over some documents.
+As an example, let's say we want to build an LLM assistant that can answer some questions over some documents.
 
 Since LLMs understand text the best, before being able to answer the question, you will need to convert other complex modalities (charts, tables) into text. However, that choice depends on the type of document you have!
 
@@ -63,6 +63,6 @@ We will explore those fundamental blocks more in the next chapter !
 
 You might wonder: "I could just write regular Python code with if-else statements to handle all these flows, right?" 
 
-While technically true, LangGraph offers **significant advantages** over vanilla Python for building complex agent systems. You could build the same application without langGraph, but it builds easier tools and abstractions for you.
+While technically true, LangGraph offers **significant advantages** over vanilla Python for building complex agent systems. You could build the same application without LangGraph, but it builds easier tools and abstractions for you.
 
 It includes states, visualization, logging (traces), built-in human-in-the-loop, and more.
