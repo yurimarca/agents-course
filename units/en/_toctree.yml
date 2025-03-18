@@ -102,7 +102,7 @@
     title: The building blocks of LangGraph
   - local: unit2/langgraph/first_graph
     title: Your first LangGraph, SPAM or HAM ?
-  - local: bonus-unit1/document_analysis_agent
+  - local: unit2/langgraph/document_analysis_agent
     title: Document Analysis Agent with LangGraph
   - local: unit2/langgraph/quiz1
     title: Quick Quiz 1
