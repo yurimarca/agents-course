@@ -46,6 +46,8 @@ Let's start with loading and preparing the dataset!
 
 ### Step 1: Load and Prepare the Dataset
 
+<hfoptions id="agents-frameworks">
+<hfoption id="smolagents">
 First, we need to transform our raw guest data into a format that's optimized for retrieval.
 
 We will use the Hugging Face `datasets` library to load the dataset and convert it into a list of `Document` objects from the `langchain.docstore.document` module.
@@ -78,6 +80,45 @@ In the code above, we:
 - Store the `Document` objects in a list
 
 This means we've got all of our data nicely available so we can get started with configuring our retrieval.
+
+</hfoption>
+<hfoption id="llama-index">
+
+```python
+from datasets import Dataset
+
+dummy_data = {
+    "name": ["Ada Lovelace", "Dr. Nikola Tesla", "Marie Curie"],
+    "relation": ["Pioneer in computing", "old friend from university days", "Physicist and chemist"],
+    "description": [
+        "Ada Lovelace is regarded as the first computer programmer and a visionary thinker.",
+        "Dr. Nikola Tesla is an old friend from your university days. He's recently patented a new wireless energy transmission system and would be delighted to discuss it with you. Just remember he's passionate about pigeons, so that might make for good small talk.",
+        "Marie Curie was a groundbreaking physicist and chemist, famous for her research on radioactivity."
+    ],
+    "email": ["ada.lovelace@example.com", "nikola.tesla@gmail.com", "marie.curie@example.com"]
+}
+
+guest_dataset = Dataset.from_dict(dummy_data)
+```
+
+```python
+from llama_index.core.schema import Document
+
+docs = [
+    Document(
+        text="\n".join([
+            f"Name: {guest_dataset['name'][i]}",
+            f"Relation: {guest_dataset['relation'][i]}",
+            f"Description: {guest_dataset['description'][i]}",
+            f"Email: {guest_dataset['email'][i]}"
+        ]),
+        metadata={"name": guest_dataset['name'][i]}
+    )
+    for i in range(len(guest_dataset))
+]
+```
+</hfoption>
+</hfoptions>
 
 ### Step 2: Create the Retriever Tool
 
