@@ -1,6 +1,6 @@
 # Building Blocks of LangGraph
 
-To build agents with LangGraph, you need to understand its core components. Let's explore the fundamental building blocks that make up a LangGraph application.
+To build applications with LangGraph, you need to understand its core components. Let's explore the fundamental building blocks that make up a LangGraph application.
 
 <img src="https://huggingface.co/datasets/agents-course/course-images/resolve/main/en/unit2/LangGraph/Building_blocks.png" alt="Building Blocks" width="70%"/>
 
@@ -10,7 +10,7 @@ An application in LangGraph starts from an **entrypoint**, and depending on the 
 
 ## 1. State
 
-**State** is the central concept in LangGraph. It represents all the information that flows through your agent application. 
+**State** is the central concept in LangGraph. It represents all the information that flows through your application. 
 
 ```python
 from typing_extensions import TypedDict
@@ -21,7 +21,7 @@ class State(TypedDict):
 
 The state is **User defined**, hence the fields should carefully be crafter to contain all data needed for decision-making process!
 
-> 💡 **Tip:** Think carefully about what information your agent needs to track between steps.
+> 💡 **Tip:** Think carefully about what information your application needs to track between steps.
 
 ## 2. Nodes
 
