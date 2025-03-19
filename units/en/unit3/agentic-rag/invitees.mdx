@@ -79,8 +79,6 @@ docs = [
 </hfoption>
 <hfoption id="llama-index">
 
-First, we need to transform our raw guest data into a format that's optimized for retrieval.
-
 We will use the Hugging Face `datasets` library to load the dataset and convert it into a list of `Document` objects from the `llama_index.core.schema` module.
 
 ```python
@@ -125,7 +123,7 @@ Now, let's create a custom tool that Alfred can use to search through our guest 
 We will use the `BM25Retriever` from the `langchain_community.retrievers` module to create a retriever tool.
 
 <Tip>
-The `BM25Retriever` is a great starting point for retrieval, but for more advanced semantic search, you might consider using embedding-based retrievers like those from [sentence-transformers](https://www.sbert.net/).
+  The <code>BM25Retriever</code> is a great starting point for retrieval, but for more advanced semantic search, you might consider using embedding-based retrievers like those from <a href="https://www.sbert.net/">sentence-transformers</a>.
 </Tip>
 
 ```python
@@ -169,7 +167,7 @@ Let's understand this tool step-by-step.
 We will use the `BM25Retriever` from the `llama_index.retrievers.bm25` module to create a retriever tool.
 
 <Tip>
-The `BM25Retriever` is a great starting point for retrieval, but for more advanced semantic search, you might consider using embedding-based retrievers like those from [sentence-transformers](https://www.sbert.net/).
+  The <code>BM25Retriever</code> is a great starting point for retrieval, but for more advanced semantic search, you might consider using embedding-based retrievers like those from <a href="https://www.sbert.net/">sentence-transformers</a>.
 </Tip>
 
 ```python
@@ -265,6 +263,9 @@ What's happening in this final step:
 - We initialize a Hugging Face model using the `HuggingFaceInferenceAPI` class
 - We create our agent (Alfred) as a `AgentWorkflow`, including the tool we just created
 - We ask Alfred to retrieve information about a guest named "Lady Ada Lovelace"
+
+</hfoption>
+</hfoptions>
 
 ## Example Interaction
 
