@@ -341,6 +341,7 @@ alfred = AgentWorkflow.from_tools_or_functions(
 # Remembering state
 ctx = Context(alfred)
 
+# First interaction
 response1 = await alfred.run("Tell me about Lady Ada Lovelace.", ctx=ctx)
 print("🎩 Alfred's First Response:")
 print(response1)
