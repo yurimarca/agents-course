@@ -217,6 +217,8 @@ email_graph.add_node("handle_spam", handle_spam)
 email_graph.add_node("draft_response", draft_response)
 email_graph.add_node("notify_mr_hugg", notify_mr_hugg)
 
+# Start the edges
+email_graph.add_edge(START, "read_email")
 # Add edges - defining the flow
 email_graph.add_edge("read_email", "classify_email")
 
