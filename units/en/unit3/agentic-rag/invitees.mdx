@@ -22,9 +22,8 @@ Our dataset [`agents-course/unit3-invitees`](https://huggingface.co/datasets/age
 - **Email Address**: Contact information for sending invitations or follow-ups
 
 Below is a preview of the dataset:
-<!-- TODO: Create a dataset -->
 <iframe
-  src="https://huggingface.co/datasets/agents-course/unit3-invitees/embed/viewer/default/validation"
+  src="https://huggingface.co/datasets/sergiopaniego/unit3-invitees/embed/viewer/default/validation"
   frameborder="0"
   width="100%"
   height="560px"
@@ -100,6 +99,33 @@ docs = [
         metadata={"name": guest_dataset['name'][i]}
     )
     for i in range(len(guest_dataset))
+]
+```
+
+</hfoption>
+<hfoption id="langgraph">
+
+We will use the Hugging Face `datasets` library to load the dataset and convert it into a list of `Document` objects from the `langchain.docstore.document` module.
+
+```python
+import datasets
+import langgraph
+from langchain.docstore.document import Document
+
+# Load the dataset
+guest_dataset = datasets.load_dataset("sergiopaniego/unit3-invitees", split="train")
+
+# Convert dataset entries into Document objects
+docs = [
+    Document(
+        page_content="\n".join([
+            f"Name: {guest['name']}",
+            f"Relation: {guest['relation']}",
+            f"Description: {guest['description']}",
+            f"Email: {guest['email']}"
+        ])
+    )
+    for guest in guest_dataset
 ]
 ```
 
@@ -195,6 +221,39 @@ Let's understand this tool step-by-step.
 - The method processes the query and returns the most relevant guest information
 
 </hfoption>
+<hfoption id="langgraph">
+
+We will use the `BM25Retriever` from the `langchain_community.retrievers` module to create a retriever tool.
+
+```python
+from langchain_community.retrievers import BM25Retriever
+from langchain.tools import Tool
+
+bm25_retriever = BM25Retriever.from_documents(docs)
+
+def extract_text(query: str) -> str:
+    """Retrieves detailed information about gala guests based on their name or relation."""
+    results = bm25_retriever.invoke(query)
+    if results:
+        return "\n\n".join([doc.text for doc in results[:3]])
+    else:
+        return "No matching guest information found."
+
+guest_info_tool = Tool(
+    name="guest_info_retriever",
+    func=extract_text,
+    description="Retrieves detailed information about gala guests based on their name or relation."
+)
+```
+
+Let's understand this tool step-by-step. 
+- The docstring help the agent understand when and how to use this tool
+- The type decorators define what parameters the tool expects (in this case, a search query)
+- We're using a `BM25Retriever`, which is a powerful text retrieval algorithm that doesn't require embeddings
+- The method processes the query and returns the most relevant guest information
+
+
+</hfoption>
 </hfoptions>
 
 ### Step 3: Integrate the Tool with Alfred
@@ -219,11 +278,14 @@ response = alfred.run("Tell me about our guest named 'Lady Ada Lovelace'.")
 print("🎩 Alfred's Response:")
 print(response)
 ```
+
 Expected output:
+
 ```python
 🎩 Alfred's Response:
 Based on the information I retrieved, Lady Ada Lovelace is an esteemed mathematician and friend. She is renowned for her pioneering work in mathematics and computing, often celebrated as the first computer programmer due to her work on Charles Babbage's Analytical Engine. Her email address is ada.lovelace@example.com.
 ```
+
 What's happening in this final step:
 - We initialize a Hugging Face model using the `HfApiModel` class
 - We create our agent (Alfred) as a `CodeAgent`, which can execute Python code to solve problems
@@ -262,6 +324,73 @@ Lady Ada Lovelace is an esteemed mathematician and friend, renowned for her pion
 What's happening in this final step:
 - We initialize a Hugging Face model using the `HuggingFaceInferenceAPI` class
 - We create our agent (Alfred) as a `AgentWorkflow`, including the tool we just created
+- We ask Alfred to retrieve information about a guest named "Lady Ada Lovelace"
+
+</hfoption>
+<hfoption id="langgraph">
+
+```python
+from typing import List, TypedDict, Annotated, Optional
+from langchain.llms import HuggingFaceHub
+from langchain_core.messages import AnyMessage
+from langgraph.graph.message import add_messages
+from langgraph.graph import StateGraph
+
+class AgentState(TypedDict):
+    guest_info: Optional[str]
+    messages: Annotated[list[AnyMessage], add_messages]
+
+
+llm = HuggingFaceHub(
+    repo_id="Qwen/Qwen2.5-Coder-32B-Instruct", 
+    huggingfacehub_api_token=HUGGINGFACEHUB_API_TOKEN
+)
+
+builder = StateGraph(AgentState)
+
+def search_guest_node(data):
+    """Retrieves detailed information about gala guests based on their name or relation."""
+    query = data['messages'][0].content  # Obtener la consulta directamente
+    results = bm25_retriever.invoke(query)
+    
+    guest_info = "\n\n".join([doc.page_content for doc in results[:1]]) if results else "No matching guest information found."
+    return {"guest_info": guest_info}
+
+builder.add_node("search_guest", search_guest_node)
+
+def generate_response(data):
+    if data["guest_info"] == "No matching guest information found.":
+        return {"messages": "I'm sorry, I couldn't find that guest."}
+
+    prompt = f"{data['messages'][0].content}\n{data['guest_info']}. Use only the info retrieved as source.\n"
+    response_text = llm.invoke(prompt).replace(prompt, "").strip()
+    
+    return {"messages": response_text}
+
+builder.add_node("generate_response", generate_response)
+
+builder.set_entry_point("search_guest")
+builder.add_edge("search_guest", "generate_response")
+
+graph = builder.compile()
+
+query = "Tell me about our guest named 'Lady Ada Lovelace'."
+response = graph.invoke({"messages": query})
+
+print("🎩 Alfred's Response:")
+print(response['messages'][1].content)
+```
+
+Expected output:
+
+```python
+🎩 Alfred's Response:
+Based on the information provided, Lady Ada Lovelace is a notable mathematician and is celebrated for her significant contributions to the field of computing. She is particularly recognized as the first computer programmer for her work on Charles Babbage's Analytical Engine. Her relation to you is described as a friend, and her contact information includes the email address ada.lovelace@example.com.
+```
+
+What's happening in this final step:
+- We initialize a Hugging Face model using the `HuggingFaceHub` class
+- We create our agent (Alfred) as a `StateGraph`, that combines 2 nodes (`search_guest`, `generate_response`) using an edge
 - We ask Alfred to retrieve information about a guest named "Lady Ada Lovelace"
 
 </hfoption>
