@@ -92,6 +92,85 @@ alfred = AgentWorkflow.from_tools_or_functions(
 ```
 
 </hfoption>
+<hfoption id="langgraph">
+
+```python
+from typing import TypedDict, Annotated, Optional
+from langchain.llms import HuggingFaceHub
+from langgraph.graph.message import add_messages
+from langgraph.graph import StateGraph
+from langchain_core.messages import AnyMessage, HumanMessage, AIMessage
+```
+
+Now, let’s combine all these tools into a single agent:
+
+```python
+class AgentState(TypedDict):
+    response: Optional[str]
+    messages: Annotated[list[AnyMessage], add_messages]
+
+llm = HuggingFaceHub(
+    repo_id="Qwen/Qwen2.5-Coder-32B-Instruct", 
+    huggingfacehub_api_token=HUGGINGFACEHUB_API_TOKEN
+)
+
+def tools_node(data):
+    messages = data["messages"]
+    query = messages[-1].content.strip()
+
+    guest_info_result = guest_info_tool.invoke(query)
+    guest_info_result_cleaned = guest_info_result.lower()
+
+    match = re.search(r"'([^']+)'", query.lower())
+    guest_name = match.group(1).lower() if match else ""
+
+    if guest_name and guest_name in guest_info_result_cleaned:
+        response = guest_info_result
+    elif "weather" in query:
+        location_match = re.search(r"weather.*in\s+([a-zA-Z\s]+)", query)
+        response = weather_info_tool.invoke(location_match.group(1).strip()) if location_match else "Location not found."
+    elif "hugging face" in query:
+        response = hub_stats_tool.invoke(query)
+    else:
+        response = search_tool.invoke(query)
+
+    return {"messages": messages + [AIMessage(content=response)]}
+
+def generate_response(data):
+    messages = data["messages"]
+
+    if messages[-1].content == "No matching guest information found.":
+        return {"messages": messages + [AIMessage(content="I'm sorry, I couldn't find that guest.")]}
+
+    history_text = "\n".join([msg.content for msg in messages])
+    prompt = f"{history_text}\nUse only the info retrieved as source.\n"
+    
+    response_text = llm.invoke(prompt).strip()
+
+    if response_text.startswith(prompt):
+        model_response = response_text[len(prompt):].strip()
+
+    messages.append(AIMessage(content=model_response))
+
+    return {"messages": messages, "response": model_response}
+
+
+builder = StateGraph(AgentState)
+
+builder.add_node("tools_node", tools_node)
+builder.add_node("generate_response", generate_response)
+
+builder.set_entry_point("tools_node")
+builder.add_edge("tools_node", "generate_response")
+
+graph = builder.compile()
+
+# Example query Alfred might receive during the gala
+response = graph.invoke({"messages": "Who is Meta AI and what's their most popular model?"})
+print("🎩 Alfred's Response:")
+print(response["response"])
+```
+</hfoption>
 </hfoptions>
 
 Your agent is now ready to use!
@@ -135,9 +214,26 @@ print(response.response.blocks[0].text)
 
 Expected output:
 
-```
+```python
 🎩 Alfred's Response:
 Lady Ada Lovelace was an English mathematician and writer, best known for her work on Charles Babbage's Analytical Engine. She was the first to recognize that the machine had applications beyond pure calculation.
+```
+
+</hfoption>
+<hfoption id="langgraph">
+
+```python
+response = graph.invoke({"messages": "Tell me about 'Lady Ada Lovelace'. What's her background and how is she related to me?"})
+
+print("🎩 Alfred's Response:")
+print(response["response"])
+```
+
+Expected output:
+
+```python
+🎩 Alfred's Response:
+Based on the information provided, Lady Ada Lovelace is a renowned mathematician and is celebrated as the first computer programmer. She worked on Charles Babbage's Analytical Engine, which is considered a precursor to modern computers. Your relation to her is described as "Pioneer in computing," indicating that she is a significant figure in the history of computing. However, the information provided does not give any specific familial or personal connection to you, only a professional one. Her email is listed as ada.lovelace@example.com, but this is likely a fictional address for illustrative purposes.
 ```
 
 </hfoption>
@@ -184,6 +280,22 @@ The weather in Paris tonight is rainy with a temperature of 15°C. Given the rai
 ```
 
 </hfoption>
+<hfoption id="langgraph">
+
+```python
+response = graph.invoke({"messages": "What's the weather like in Paris tonight? Will it be suitable for our fireworks display?"})
+
+print("🎩 Alfred's Response:")
+print(response["response"])
+```
+
+Expected output:
+
+```
+🎩 Alfred's Response:
+Based on the information provided, the weather in Paris tonight is windy with a temperature of 20°C. While the temperature seems suitable for a fireworks display, the wind could pose a challenge. It might be advisable to monitor the wind conditions closer to the event time to ensure the safety and quality of the fireworks display.
+```
+</hfoption>
 </hfoptions>
 
 ### Example 3: Impressing AI Researchers
@@ -226,6 +338,21 @@ Expected output:
 The most popular model by Google on the Hugging Face Hub is google/electra-base-discriminator, with 28,546,752 downloads.
 ```
 
+</hfoption>
+<hfoption id="langgraph">
+```python
+response = graph.invoke({"messages": "One of our guests is from Anthropic. What can you tell me about their most popular model?"})
+
+print("🎩 Alfred's Response:")
+print(response["response"])
+```
+
+Expected output:
+
+```
+🎩 Alfred's Response:
+Based on the information provided, Anthropic's most popular model appears to be Claude 3.5 Sonnet. This model is described as being faster and cheaper than their previous flagship model, Claude 3 Opus. It is also noted that Claude 3.5 Sonnet can use a computer like a human would, and it has been released in beta mode. However, there is some confusion in the provided information as it also mentions Claude 3.7 Sonnet, which is described as being able to "think" about questions for as long as users want it to. It is unclear whether Claude 3.5 Sonnet or Claude 3.7 Sonnet is Anthropic's most popular model based on the given information. The most recent and clear information points to Claude 3.5 Sonnet as Anthropic's latest model with improved performance and cost-effectiveness.
+```
 </hfoption>
 </hfoptions>
 
@@ -297,6 +424,43 @@ Here are some recent advancements in wireless energy that you might find useful 
 ```
 
 </hfoption>
+<hfoption id="langgraph">
+```python
+response = graph.invoke({"messages":"I need to speak with 'Dr. Nikola Tesla' about recent advancements in wireless energy. Can you help me prepare for this conversation?"})
+
+print("🎩 Alfred's Response:")
+print(response["response"])
+```
+
+Expected output:
+
+```
+🎩 Alfred's Response:
+Certainly! Here’s a draft for your email to Dr. Nikola Tesla:
+
+---
+
+Subject: Exciting Developments in Wireless Energy Transmission
+
+Dear Dr. Tesla,
+
+I hope this email finds you well. It’s been so long since we last caught up at the university, and I’ve been following your incredible work with great interest. I recently came across your latest patent on wireless energy transmission and I’m absolutely fascinated by the potential it holds for the future.
+
+I would love to discuss your recent advancements in more detail. Your innovative approach to solving some of the world’s most pressing energy challenges is truly inspiring. I believe there’s a lot we can learn from each other, and I’d be honored to hear more about your vision and the challenges you’ve faced during the development of this technology.
+
+On a lighter note, I remember you had a particular fondness for pigeons. I’ve been reading up on some recent studies on pigeon behavior and thought we could perhaps share some interesting insights on that topic as well. It would be a pleasure to catch up on both our professional and personal interests.
+
+Looking forward to your response.
+
+Best regards,
+
+[Your Name]
+
+---
+
+Feel free to adjust the tone and content as you see fit!
+```
+</hfoption>
 </hfoptions>
 
 ## Advanced Features: Conversation Memory
@@ -351,6 +515,9 @@ response2 = await alfred.run("What projects is she currently working on?", ctx=c
 print("🎩 Alfred's Second Response:")
 print(response2)
 ```
+
+</hfoption>
+<hfoption id="langgraph">
 
 </hfoption>
 </hfoptions>
