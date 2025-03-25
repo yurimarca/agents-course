@@ -124,6 +124,8 @@
     title: Introduction
   - local: bonus-unit2/what-is-agent-observability-and-evaluation
     title: What is agent observability and evaluation?
+  - local: bonus-unit2/monitoring-and-evaluating-agents-notebook
+    title: Monitoring and evaluating agents
   - local: bonus-unit2/quiz
     title: Quiz
 - title: When the next steps are published?
