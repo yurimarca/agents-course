@@ -60,6 +60,23 @@ The current President of France in Emmanuel Macron.
 ```
 
 </hfoption>
+<hfoption id="langgraph">
+
+```python
+from langchain_community.tools import DuckDuckGoSearchRun
+
+search_tool = DuckDuckGoSearchRun()
+results = search_tool.invoke("Who's the current President of France?")
+print(results)
+```
+
+Expected output:
+
+```python
+The current President of France in Emmanuel Macron.
+```
+
+</hfoption>
 </hfoptions>
 
 ## Creating a Custom Tool for Weather Information to Schedule the Fireworks
@@ -128,6 +145,34 @@ def get_weather_info(location: str) -> str:
 weather_info_tool = FunctionTool.from_defaults(get_weather_info)
 
 print(weather_info_tool('Paris'))
+```
+
+</hfoption>
+<hfoption id="langgraph">
+
+```python
+from langchain.tools import Tool
+import random
+
+def get_weather_info(location: str) -> str:
+    """Fetches dummy weather information for a given location."""
+    # Dummy weather data
+    weather_conditions = [
+        {"condition": "Rainy", "temp_c": 15},
+        {"condition": "Clear", "temp_c": 25},
+        {"condition": "Windy", "temp_c": 20}
+    ]
+    # Randomly select a weather condition
+    data = random.choice(weather_conditions)
+    return f"Weather in {location}: {data['condition']}, {data['temp_c']}°C"
+
+weather_info_tool = Tool(
+    name="get_weather_info",
+    func=get_weather_info,
+    description="Fetches dummy weather information for a given location."
+)
+
+print(weather_info_tool.invoke('Paris'))
 ```
 
 </hfoption>
@@ -212,8 +257,46 @@ print(hub_stats_tool("facebook")) # Example: Get the most downloaded model by Fa
 
 Expected output:
 
-```Python
+```python
 The most downloaded model by facebook is facebook/esmfold_v1 with 12,544,550 downloads.
+```
+
+</hfoption>
+<hfoption id="langgraph">
+
+```python
+from langchain.tools import Tool
+from huggingface_hub import list_models
+
+def get_hub_stats(author: str) -> str:
+    """Fetches the most downloaded model from a specific author on the Hugging Face Hub."""
+    try:
+        # List models from the specified author, sorted by downloads
+        models = list(list_models(author=author, sort="downloads", direction=-1, limit=1))
+
+        if models:
+            model = models[0]
+            return f"The most downloaded model by {author} is {model.id} with {model.downloads:,} downloads."
+        else:
+            return f"No models found for author {author}."
+    except Exception as e:
+        return f"Error fetching models for {author}: {str(e)}"
+
+# Initialize the tool
+hub_stats_tool = Tool(
+    name="get_hub_stats",
+    func=get_hub_stats,
+    description="Fetches the most downloaded model from a specific author on the Hugging Face Hub."
+)
+
+# Example usage
+print(hub_stats_tool("facebook")) # Example: Get the most downloaded model by Facebook
+```
+
+Expected output:
+
+```python
+The most downloaded model by facebook is facebook/esmfold_v1 with 13,109,861 downloads.
 ```
 
 </hfoption>
@@ -284,6 +367,62 @@ Expected output:
 Meta AI, formerly known as Facebook AI, is a research lab focused on advancing and applying artificial intelligence to solve real-world problems. Their most popular model on the Hugging Face Hub is `facebook/esmfold_v1`, which has been downloaded 12,544,550 times.
 ```
 
+</hfoption>
+<hfoption id="langgraph">
+
+```python
+from typing import TypedDict, Annotated, Optional
+from langchain.llms import HuggingFaceHub
+from langgraph.graph.message import add_messages
+from langgraph.graph import StateGraph
+from langchain_core.messages import AnyMessage
+
+# Define the state
+class AgentState(TypedDict):
+    response: Optional[str]
+    messages: Annotated[list[AnyMessage], add_messages]
+
+# Initialize the LLM
+llm = HuggingFaceHub(
+    repo_id="Qwen/Qwen2.5-Coder-32B-Instruct", 
+    huggingfacehub_api_token=HUGGINGFACEHUB_API_TOKEN
+)
+
+# Define the function to choose a tool
+def tool_agent(data):
+    query = data["messages"][0].content.lower()
+
+    if "weather" in query:
+        response = weather_info_tool.invoke(query)  # Example location
+    elif "hugging face" in query:
+        response = hub_stats_tool.invoke(query)
+    else:
+        response = search_tool.invoke(query)  # Default to web search
+
+    return {"response": response}
+
+# Set up LangGraph
+builder = StateGraph(AgentState)
+
+# Add the agent node
+builder.add_node("agent", tool_agent)
+builder.set_entry_point("agent")
+
+# Compile the graph
+graph = builder.compile()
+
+# Example query Alfred might receive during the gala
+response = graph.invoke({"messages": "Who is Meta AI and what's their most popular model?"})
+print("🎩 Alfred's Response:")
+print(response["response"])
+```
+
+Expected output:
+
+```python
+🎩 Alfred's Response:
+According to the company, Meta AI is set to become the world's most widely used AI assistant by the end of the year. Over 400 million people interact with Meta AI monthly, with 185 million using ... Designed to make AI accessible to everyone, the AI model is built on Meta's open-source Llama 3.2 and works across the company's ecosystem allowing users to create, interact, and benefit from AI ... We tried seven of the most popular AI chatbots (ChatGPT, Claude, Grok, Perplexity and Arc Search, Meta AI, Microsoft Copilot) to find out. ... It uses a mix of models to produce its responses ... Yet, the difference is that Meta AI, the chatbot, integrated across Meta's social media platforms, has surpassed 500 million users since its wide release in April 2024. The rise of Meta AI. Meta AI's ascent to 500 million users in just seven months is a testament to its accessibility and utility. Impact of Meta AI on the Metaverse and VR/AR; History of Meta AI. Meta AI started as Facebook AI, focusing on AI research and innovation. In 2021, when Facebook rebranded to Meta, the scope of AI expanded further. Meta AI has made significant advancements in NLP (Natural Language Processing), computer vision, and deep learning. Use Cases of Meta AI
+```
 </hfoption>
 </hfoptions>
 
