@@ -1,5 +1,6 @@
 # Creating a RAG Tool for Guest Stories
 
+
 Alfred, your trusted agent, is preparing for the most extravagant gala of the century. To ensure the event runs smoothly, Alfred needs quick access to up-to-date information about each guest. Let's help Alfred by creating a custom Retrieval-Augmented Generation (RAG) tool, powered by our a custom dataset.
 
 ## Why RAG for a Gala?
@@ -11,6 +12,17 @@ Imagine Alfred mingling among the guests, needing to recall specific details abo
 3. Alfred needs to retrieve precise details like email addresses
 
 This is where Retrieval Augmented Generation (RAG) shines! By combining a retrieval system with an LLM, Alfred can access accurate, up-to-date information about your guests on demand.
+
+## Setting up our application
+
+In this unit, we'll develop our agent using a structured Python project. This approach allows us to organize our code across multiple files, each handling a specific part of the application.  
+
+### Project Structure  
+- **`tools.py`** – Contains auxiliary tools for our agent.  
+- **`retriever.py`** – Implements retrieval functions to support the agent.  
+- **`agent.py`** – Combines all components into a fully functional agent, which we'll finalize in the last part of this unit.  
+
+For a detailed reference on the project structure, check out [this HF Space](#). Feel free to clone it and experiment with it!
 
 ## Dataset Overview
 
