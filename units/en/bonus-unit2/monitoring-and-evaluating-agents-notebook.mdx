@@ -42,31 +42,34 @@ In this notebook, we will use [Langfuse](https://langfuse.com/) as our observabi
 
 **Note:** If you are using LlamaIndex or LangGraph, you can find documentation on instrumenting them [here](https://langfuse.com/docs/integrations/llama-index/workflows) and [here](https://langfuse.com/docs/integrations/langchain/example-python-langgraph). 
 
+First, let's configure the right environment variable for setting up the connection to the Langfuse OpenTelemetry endpoint. 
 
 ```python
 import os
 import base64
 
 # Get your own keys from https://cloud.langfuse.com
-os.environ["LANGFUSE_PUBLIC_KEY"] = "pk-lf-..." 
-os.environ["LANGFUSE_SECRET_KEY"] = "sk-lf-..." 
+LANGFUSE_PUBLIC_KEY = = "pk-lf-..." 
+LANGFUSE_SECRET_KEY = "sk-lf-..." 
+os.environ["LANGFUSE_PUBLIC_KEY"] = LANGFUSE_PUBLIC_KEY
+os.environ["LANGFUSE_SECRET_KEY"] = LANGFUSE_SECRET_KEY
 os.environ["LANGFUSE_HOST"] = "https://cloud.langfuse.com"  # 🇪🇺 EU region example
 # os.environ["LANGFUSE_HOST"] = "https://us.cloud.langfuse.com"  # 🇺🇸 US region example
 
 LANGFUSE_AUTH = base64.b64encode(
-    f"{os.environ.get('LANGFUSE_PUBLIC_KEY')}:{os.environ.get('LANGFUSE_SECRET_KEY')}".encode()
+    f"{LANGFUSE_PUBLIC_KEY}:{LANGFUSE_SECRET_KEY}".encode()
 ).decode()
 
 os.environ["OTEL_EXPORTER_OTLP_ENDPOINT"] = os.environ.get("LANGFUSE_HOST") + "/api/public/otel"
 os.environ["OTEL_EXPORTER_OTLP_HEADERS"] = f"Authorization=Basic {LANGFUSE_AUTH}"
 ```
-
+We also need to configure or Hugging Face token for inference calls.
 
 ```python
 # Set your Hugging Face and other tokens/secrets as environment variable
 os.environ["HF_TOKEN"] = "hf_..." 
 ```
-
+Next, we can set up the a tracer-provider for our configured OpenTelemetry.
 
 ```python
 from opentelemetry.sdk.trace import TracerProvider
@@ -87,7 +90,6 @@ tracer = trace.get_tracer(__name__)
 
 # Instrument smolagents with the configured provider
 SmolagentsInstrumentor().instrument(tracer_provider=trace_provider)
-
 ```
 
 ## Step 2: Test Your Instrumentation
@@ -176,10 +178,10 @@ You may also pass additional attributes—such as user IDs, session IDs, or tags
 
 
 ```python
-from smolagents import (CodeAgent, GoogleSearchTool, HfApiModel)
+from smolagents import (CodeAgent, DuckDuckGoSearchTool, HfApiModel)
 from opentelemetry import trace
 
-search_tool = GoogleSearchTool()
+search_tool = DuckDuckGoSearchTool()
 agent = CodeAgent(
     tools=[search_tool],
     model=HfApiModel()
