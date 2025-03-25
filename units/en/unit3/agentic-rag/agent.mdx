@@ -70,7 +70,8 @@ Now, let's combine all these tools into a single agent:
 llm = HuggingFaceInferenceAPI(model_name="Qwen/Qwen2.5-Coder-32B-Instruct")
 
 # Initialize the web search tool
-search_tool = FunctionTool.from_defaults(get_search_info)
+tool_spec = DuckDuckGoSearchToolSpec()
+search_tool = FunctionTool.from_defaults(tool_spec.duckduckgo_full_search)
 
 # Initialize the weather tool
 weather_info_tool = FunctionTool.from_defaults(get_weather_info)
@@ -82,9 +83,6 @@ hub_stats_tool = FunctionTool.from_defaults(get_hub_stats)
 guest_info_tool = FunctionTool.from_defaults(get_guest_info_retriever)
 
 # Create Alfred with all the tools
-
-
-# Initialize the Hugging Face model
 alfred = AgentWorkflow.from_tools_or_functions(
     [guest_info_tool, search_tool, weather_info_tool, hub_stats_tool],
     llm=llm,

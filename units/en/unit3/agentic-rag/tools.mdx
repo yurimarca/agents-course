@@ -36,27 +36,22 @@ The current President of France in Emmanuel Macron.
 <hfoption id="llama-index">
 
 ```python
+from llama_index.tools.duckduckgo import DuckDuckGoSearchToolSpec
 from llama_index.core.tools import FunctionTool
-from duckduckgo_search import DDGS
-
-def get_search_info(query: str, max_results: int = 10) -> str:
-    ddgs = DDGS()
-    results = ddgs.text(query, max_results=max_results)
-    if len(results) == 0:
-        raise Exception("No results found! Try a less restrictive/shorter query.")
-    postprocessed_results = [f"[{result['title']}]({result['href']})\n{result['body']}" for result in results]
-    return "## Search Results\n\n" + "\n\n".join(postprocessed_results)
 
 # Initialize the DuckDuckGo search tool
-search_tool = FunctionTool.from_defaults(get_search_info)
+tool_spec = DuckDuckGoSearchToolSpec()
+
+search_tool = FunctionTool.from_defaults(tool_spec.duckduckgo_full_search)
 # Example usage
-print(search_tool("Who's the current President of France?"))
+response = search_tool("Who's the current President of France?")
+print(response)
 ```
 
 Expected output:
 
 ```python
-The current President of France in Emmanuel Macron.
+[{'title': 'President of France - Wikipedia', 'href': 'https://en.wikipedia.org/wiki/President_of_France', 'body': 'The president of France, officially the president of the French Republic (French: Président de la République française), is the executive head of state of France, and the commander-in-chief of the French Armed Forces.As the presidency is the supreme magistracy of the country, the position is the highest office in France. The powers, functions and duties of prior presidential offices, in ...'}, {'title': 'Emmanuel Macron - Wikipedia', 'href': 'https://en.wikipedia.org/wiki/Emmanuel_Macron', 'body': 'Emmanuel Jean-Michel Frédéric Macron (French: [emanɥɛl makʁɔ̃] ⓘ; born 21 December 1977) is a French politician who has served as President of France since 2017. He was Minister of Economics, Industry and Digital Affairs under President François Hollande between 2014-16. He has been a member of Renaissance since he founded it in 2016.. Born in Amiens, Macron studied philosophy at ...'}, {'title': 'Emmanuel Macron - Wife, Education & Family - Biography', 'href': 'https://www.biography.com/political-figures/emmanuel-macron', 'body': "Former economy minister Emmanuel Macron was elected president of France in 2017, making him the youngest president in the country's history. Search Women's History Month"}, {'title': 'Presidency of Emmanuel Macron - Wikipedia', 'href': 'https://en.wikipedia.org/wiki/Presidency_of_Emmanuel_Macron', 'body': 'Emmanuel Macron is currently serving as the 25th president of France.He took office upon winning the 2017 French presidential election.Macron was the founding member of Renaissance (originally En Marche ! and later La République En Marche !He defeated National Rally nominee Marine Le Pen.He again defeated Le Pen in the 2022 French presidential election.'}, {'title': 'Emmanuel Macron | Biography, Political Party, Age, Presidency, & Facts ...', 'href': 'https://www.britannica.com/biography/Emmanuel-Macron', 'body': "Emmanuel Macron (born December 21, 1977, Amiens, France) is a French banker and politician who was elected president of France in 2017. Macron was the first person in the history of the Fifth Republic to win the presidency without the backing of either the Socialists or the Gaullists, and he was France's youngest head of state since Napoleon I.He was reelected in 2022, becoming the first ..."}, {'title': 'Welcome to the website of the French Presidency - Élysée', 'href': 'https://www.elysee.fr/en/', 'body': "Welcome to the official website of the President of France The President's latest news All news 21 September 2023 State Visit of His Majesty King Charles III and Queen Camilla. 20 March 2025 European Council - 20 & 21 March 2025. 17 March 2025 Working lunch with the ..."}, {'title': 'Emmanuel Macron - Élysée', 'href': 'https://www.elysee.fr/en/emmanuel-macron', 'body': 'Emmanuel Macron is the eighth President of the Fifth Republic of France. He launched the movement « En Marche ! », founded on 6 April 2016, and was its leader until his victory in the presidential election on 7 May 2017. On 24 April 2022, Emmanuel Macron was re-elected President of the Republic.'}, {'title': 'Who is the current president of France? - ump-lycees.fr', 'href': 'https://www.ump-lycees.fr/en/who-is-the-current-president-of-france', 'body': 'Emmanuel Macron, born on December 21, 1977, is the current president of the French Republic.In office since May 14, 2017, he was re-elected on April 24, 2022 with 58.55% of the votes against his competitor Marine Le Pen. With a background in higher public service and investment banking, Macron approaches his mandate with a desire for change and innovation in various fields, including economics ...'}, {'title': 'Who is the President of France? - WorldAtlas', 'href': 'https://www.worldatlas.com/articles/who-is-the-president-of-france.html', 'body': "Emmanuel Macron is the current French President and also Andorra's ex-official Co-Prince. Before joining politics, he worked in various senior positions as a civil servant and he served in the Inspectorate General of Finances as an Inspector of Finances. In 2012, President Francois Hollande selected Macron as the Deputy Secretary-General in ..."}, {'title': 'President of the French Republic - Simple English Wikipedia, the free ...', 'href': 'https://simple.wikipedia.org/wiki/President_of_the_French_Republic', 'body': 'The President of the French Republic is the head of state of France. The current President is Emmanuel Macron since 14 May 2017 defeating Marine Le Pen in the second round of the presidential election on 7 May 2017. List of French presidents (Fifth Republic) N° Portrait Name ...'}]
 ```
 
 </hfoption>
@@ -217,7 +212,7 @@ class HubStatsTool(Tool):
 hub_stats_tool = HubStatsTool()
 
 # Example usage
-print(hub_stats_tool("facebook")) # Example: Get the most downloaded model by Facebook
+print(hub_stats_tool.invoke("facebook")) # Example: Get the most downloaded model by Facebook
 ```
 
 Expected output:
@@ -354,7 +349,7 @@ alfred = AgentWorkflow.from_tools_or_functions(
 )
 
 # Example query Alfred might receive during the gala
-response = await alfred.run("Who is Meta AI and what's their most popular model?")
+response = await alfred.run("What is Facebook and what's their most popular model?")
 
 print("🎩 Alfred's Response:")
 print(response)
@@ -364,7 +359,7 @@ Expected output:
 
 ```python
 🎩 Alfred's Response:
-Meta AI, formerly known as Facebook AI, is a research lab focused on advancing and applying artificial intelligence to solve real-world problems. Their most popular model on the Hugging Face Hub is `facebook/esmfold_v1`, which has been downloaded 12,544,550 times.
+Facebook is a social networking service and technology company based in Menlo Park, California. It was founded by Mark Zuckerberg and allows people to create profiles, connect with friends and family, share photos and videos, and join groups based on shared interests. The most popular model by Facebook on the Hugging Face Hub is `facebook/esmfold_v1` with 13,109,861 downloads.
 ```
 
 </hfoption>
