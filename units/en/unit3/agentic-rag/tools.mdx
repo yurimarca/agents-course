@@ -375,44 +375,62 @@ from typing import TypedDict, Annotated, Optional
 from langchain.llms import HuggingFaceHub
 from langgraph.graph.message import add_messages
 from langgraph.graph import StateGraph
-from langchain_core.messages import AnyMessage
+from langchain_core.messages import AnyMessage, HumanMessage, AIMessage
 
-# Define the state
 class AgentState(TypedDict):
     response: Optional[str]
     messages: Annotated[list[AnyMessage], add_messages]
 
-# Initialize the LLM
 llm = HuggingFaceHub(
     repo_id="Qwen/Qwen2.5-Coder-32B-Instruct", 
     huggingfacehub_api_token=HUGGINGFACEHUB_API_TOKEN
 )
 
-# Define the function to choose a tool
-def tool_agent(data):
-    query = data["messages"][0].content.lower()
-
+def tools_node(data):
+    messages = data["messages"]
+    query = messages[-1].content.strip()
+    
     if "weather" in query:
-        response = weather_info_tool.invoke(query)  # Example location
-    elif "hugging face" in query:
-        response = hub_stats_tool.invoke(query)
+        location_match = re.search(r"weather.*in\s+([a-zA-Z\s]+)", query)
+        response = weather_info_tool.invoke(location_match.group(1).strip()) if location_match else "Location not found."
+    elif "hugging face" in query.lower():
+        if "facebook" in query.lower(): response = hub_stats_tool.invoke("facebook")
+        elif "google" in query.lower(): response = hub_stats_tool.invoke("google")
+        else: response = "Org not found."
     else:
-        response = search_tool.invoke(query)  # Default to web search
+        response = search_tool.invoke(query)
 
-    return {"response": response}
+    return {"messages": messages + [AIMessage(content=response)]}
 
-# Set up LangGraph
+
+def generate_response(data):
+    messages = data["messages"]
+
+    history_text = "\n".join([msg.content for msg in messages])
+    prompt = f"{history_text}\nUse only the info retrieved as source.\n"
+    
+    response_text = llm.invoke(prompt).strip()
+
+    if response_text.startswith(prompt):
+        model_response = response_text[len(prompt):].strip()
+
+    messages.append(AIMessage(content=model_response))
+
+    return {"messages": messages, "response": model_response}
+
+
 builder = StateGraph(AgentState)
 
-# Add the agent node
-builder.add_node("agent", tool_agent)
-builder.set_entry_point("agent")
+builder.add_node("tools_node", tools_node)
+builder.add_node("generate_response", generate_response)
 
-# Compile the graph
+builder.set_entry_point("tools_node")
+builder.add_edge("tools_node", "generate_response")
+
 graph = builder.compile()
 
 # Example query Alfred might receive during the gala
-response = graph.invoke({"messages": "Who is Meta AI and what's their most popular model?"})
+response = graph.invoke({"messages": "What is Facebook and what's their most popular model on the Hugging Face Hub?"})
 print("🎩 Alfred's Response:")
 print(response["response"])
 ```
