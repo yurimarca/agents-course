@@ -15,14 +15,23 @@ This is where Retrieval Augmented Generation (RAG) shines! By combining a retrie
 
 ## Setting up our application
 
-In this unit, we'll develop our agent using a structured Python project. This approach allows us to organize our code across multiple files, each handling a specific part of the application.  
+In this unit, we'll develop our agent within a structured Python project. This approach helps us maintain clean, modular code by organizing different functionalities into separate files.  
 
 ### Project Structure  
-- **`tools.py`** – Contains auxiliary tools for our agent.  
-- **`retriever.py`** – Implements retrieval functions to support the agent.  
-- **`agent.py`** – Combines all components into a fully functional agent, which we'll finalize in the last part of this unit.  
+- **`tools.py`** – Provides auxiliary tools for the agent.  
+- **`retriever.py`** – Implements retrieval functions to support knowledge access.  
+- **`app.py`** – Integrates all components into a fully functional agent, which we'll finalize in the last part of this unit.  
 
-For a detailed reference on the project structure, check out [this HF Space](#). Feel free to clone it and experiment with it!
+For a hands-on reference, check out [this HF Space](https://huggingface.co/spaces/sergiopaniego/AgenticRAG), where the Agentic RAG developed in this unit is live. Feel free to clone it and experiment!
+
+You can directly test the agent below:
+
+<iframe
+	src="https://sergiopaniego-agenticrag.hf.space/"
+	frameborder="0"
+	width="850"
+	height="450"
+></iframe>
 
 ## Dataset Overview
 
@@ -79,7 +88,7 @@ docs = [
             f"Relation: {guest['relation']}",
             f"Description: {guest['description']}",
             f"Email: {guest['email']}"
-        ])
+        ]),
         metadata={"name": guest["name"]}
     )
     for guest in guest_dataset
@@ -134,7 +143,8 @@ docs = [
             f"Relation: {guest['relation']}",
             f"Description: {guest['description']}",
             f"Email: {guest['email']}"
-        ])
+        ]),
+        metadata={"name": guest["name"]}
     )
     for guest in guest_dataset
 ]
