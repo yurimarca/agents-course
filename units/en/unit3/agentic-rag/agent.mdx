@@ -9,7 +9,7 @@ In this section, we'll combine the guest information retrieval, web search, weat
 Instead of reimplementing all the tools we've created in previous sections, we'll import them from their respective modules which we saved in the `tools.py` and `retriever.py` files.
 
 <Tip>
-If you haven't implemented the tools yet, go back to the [tools](./tools.mdx) and [retriever](./invitees.mdx) sections to implement them, and add them to the `tools.py` and `retriever.py` files.
+If you haven't implemented the tools yet, go back to the <a href="./tools">tools</a> and <a href="./invitees">retriever</a> sections to implement them, and add them to the `tools.py` and `retriever.py` files.
 </Tip>
 
 Let's import the necessary libraries and tools from the previous sections:
@@ -212,7 +212,7 @@ print(response.response.blocks[0].text)
 
 Expected output:
 
-```python
+```
 🎩 Alfred's Response:
 Lady Ada Lovelace was an English mathematician and writer, best known for her work on Charles Babbage's Analytical Engine. She was the first to recognize that the machine had applications beyond pure calculation.
 ```
@@ -229,7 +229,7 @@ print(response["response"])
 
 Expected output:
 
-```python
+```
 🎩 Alfred's Response:
 Based on the information provided, Lady Ada Lovelace is a renowned mathematician and is celebrated as the first computer programmer. She worked on Charles Babbage's Analytical Engine, which is considered a precursor to modern computers. Your relation to her is described as "Pioneer in computing," indicating that she is a significant figure in the history of computing. However, the information provided does not give any specific familial or personal connection to you, only a professional one. Her email is listed as ada.lovelace@example.com, but this is likely a fictional address for illustrative purposes.
 ```
@@ -516,6 +516,19 @@ print(response2)
 
 </hfoption>
 <hfoption id="langgraph">
+
+```python
+response = graph.invoke({"messages": [HumanMessage(content="Tell me about 'Lady Ada Lovelace'. What's her background and how is she related to me?")]})
+
+print("🎩 Alfred's Response:")
+print(response["response"])
+print()
+
+response = graph.invoke({"messages": response["messages"] + [HumanMessage(content="What projects is she currently working on?")]})
+
+print("🎩 Alfred's Response:")
+print(response["response"])
+```
 
 </hfoption>
 </hfoptions>

@@ -35,7 +35,7 @@ You can directly test the agent below:
 
 ## Dataset Overview
 
-Our dataset [`agents-course/unit3-invitees`](https://huggingface.co/datasets/agents-course/unit3-invitees/) contains the following fields for each guest:
+Our dataset [`sergiopaniego/unit3-invitees`](https://huggingface.co/datasets/sergiopaniego/unit3-invitees/) contains the following fields for each guest:
 
 - **Name**: Guest's full name
 - **Relation**: How the guest is related to the host
@@ -78,7 +78,7 @@ import datasets
 from langchain.docstore.document import Document
 
 # Load the dataset
-guest_dataset = datasets.load_dataset("agents-course/unit3-invitees", split="train")
+guest_dataset = datasets.load_dataset("sergiopaniego/unit3-invitees", split="train")
 
 # Convert dataset entries into Document objects
 docs = [
@@ -246,6 +246,10 @@ Let's understand this tool step-by-step.
 
 We will use the `BM25Retriever` from the `langchain_community.retrievers` module to create a retriever tool.
 
+<Tip>
+  The <code>BM25Retriever</code> is a great starting point for retrieval, but for more advanced semantic search, you might consider using embedding-based retrievers like those from <a href="https://www.sbert.net/">sentence-transformers</a>.
+</Tip>
+
 ```python
 from langchain_community.retrievers import BM25Retriever
 from langchain.tools import Tool
@@ -302,7 +306,7 @@ print(response)
 
 Expected output:
 
-```python
+```
 🎩 Alfred's Response:
 Based on the information I retrieved, Lady Ada Lovelace is an esteemed mathematician and friend. She is renowned for her pioneering work in mathematics and computing, often celebrated as the first computer programmer due to her work on Charles Babbage's Analytical Engine. Her email address is ada.lovelace@example.com.
 ```
@@ -337,7 +341,7 @@ print(response)
 
 Expected output:
 
-```python
+```
 🎩 Alfred's Response:
 Lady Ada Lovelace is an esteemed mathematician and friend, renowned for her pioneering work in mathematics and computing. She is celebrated as the first computer programmer due to her work on Charles Babbage's Analytical Engine. Her email is ada.lovelace@example.com.
 ```
@@ -422,7 +426,7 @@ print(response['messages'][2].content)
 
 Expected output:
 
-```python
+```
 🎩 Alfred's Response:
 Based on the information provided, Lady Ada Lovelace is a notable mathematician and is celebrated for her significant contributions to the field of computing. She is particularly recognized as the first computer programmer for her work on Charles Babbage's Analytical Engine. Her relation to you is described as a friend, and her contact information includes the email address ada.lovelace@example.com.
 ```
@@ -463,8 +467,8 @@ Now that Alfred can retrieve guest information, consider how you might enhance t
 
 Now Alfred is fully equipped to handle guest inquiries effortlessly, ensuring your gala is remembered as the most sophisticated and delightful event of the century!
 
-<Exercise>
-Try extending the `GuestInfoRetrieverTool` to also return conversation starters based on each guest's interests or background. How would you modify the tool to accomplish this?
+<Tip warning={true}>
+Try extending the retriver tool to also return conversation starters based on each guest's interests or background. How would you modify the tool to accomplish this?
 
-When you're done, implement your guest retriever tool in the `retriever.py` file.
-</Exercise>
+When you're done, implement your guest retriever tool in the <code>retriever.py</code> file.
+</Tip>
