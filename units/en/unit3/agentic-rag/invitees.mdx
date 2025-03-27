@@ -23,12 +23,12 @@ In this unit, we'll develop our agent within a HF Space, as a structured Python 
 - **`retriever.py`** – Implements retrieval functions to support knowledge access.  
 - **`app.py`** – Integrates all components into a fully functional agent, which we'll finalize in the last part of this unit.  
 
-For a hands-on reference, check out [this HF Space](https://huggingface.co/spaces/sergiopaniego/AgenticRAG), where the Agentic RAG developed in this unit is live. Feel free to clone it and experiment!
+For a hands-on reference, check out [this HF Space](https://huggingface.co/spaces/agents-course/Unit_3_Agentic_RAG), where the Agentic RAG developed in this unit is live. Feel free to clone it and experiment!
 
 You can directly test the agent below:
 
 <iframe
-	src="https://sergiopaniego-agenticrag.hf.space/"
+	src="https://agents-course-unit-3-agentic-rag.hf.space"
 	frameborder="0"
 	width="850"
 	height="450"
@@ -36,7 +36,7 @@ You can directly test the agent below:
 
 ## Dataset Overview
 
-Our dataset [`sergiopaniego/unit3-invitees`](https://huggingface.co/datasets/sergiopaniego/unit3-invitees/) contains the following fields for each guest:
+Our dataset [`agents-course/unit3-invitees`](https://huggingface.co/datasets/agents-course/unit3-invitees/) contains the following fields for each guest:
 
 - **Name**: Guest's full name
 - **Relation**: How the guest is related to the host
@@ -45,7 +45,7 @@ Our dataset [`sergiopaniego/unit3-invitees`](https://huggingface.co/datasets/ser
 
 Below is a preview of the dataset:
 <iframe
-  src="https://huggingface.co/datasets/sergiopaniego/unit3-invitees/embed/viewer/default/validation"
+  src="https://huggingface.co/datasets/agents-course/unit3-invitees/embed/viewer/default/train"
   frameborder="0"
   width="100%"
   height="560px"
@@ -79,7 +79,7 @@ import datasets
 from langchain.docstore.document import Document
 
 # Load the dataset
-guest_dataset = datasets.load_dataset("sergiopaniego/unit3-invitees", split="train")
+guest_dataset = datasets.load_dataset("agents-course/unit3-invitees", split="train")
 
 # Convert dataset entries into Document objects
 docs = [
@@ -107,7 +107,7 @@ import datasets
 from llama_index.core.schema import Document
 
 # Load the dataset
-guest_dataset = datasets.load_dataset("sergiopaniego/unit3-invitees", split="train")
+guest_dataset = datasets.load_dataset("agents-course/unit3-invitees", split="train")
 
 # Convert dataset entries into Document objects
 docs = [
@@ -134,7 +134,7 @@ import datasets
 from langchain.docstore.document import Document
 
 # Load the dataset
-guest_dataset = datasets.load_dataset("sergiopaniego/unit3-invitees", split="train")
+guest_dataset = datasets.load_dataset("agents-course/unit3-invitees", split="train")
 
 # Convert dataset entries into Document objects
 docs = [
