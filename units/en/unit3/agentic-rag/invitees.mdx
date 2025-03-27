@@ -8,14 +8,14 @@ Alfred, your trusted agent, is preparing for the most extravagant gala of the ce
 Imagine Alfred mingling among the guests, needing to recall specific details about each person at a moment's notice. A traditional LLM might struggle with this task because:
 
 1. The guest list is specific to your event and not in the model's training data
-2. Guest information may change or update frequently
+2. Guest information may change or be updated frequently
 3. Alfred needs to retrieve precise details like email addresses
 
 This is where Retrieval Augmented Generation (RAG) shines! By combining a retrieval system with an LLM, Alfred can access accurate, up-to-date information about your guests on demand.
 
 ## Setting up our application
 
-In this unit, we'll develop our agent within a HF Space, as an structured Python project. This approach helps us maintain clean, modular code by organizing different functionalities into separate files.  
+In this unit, we'll develop our agent within a HF Space, as a structured Python project. This approach helps us maintain clean, modular code by organizing different functionalities into separate files.  
 
 ### Project Structure
 
@@ -452,7 +452,7 @@ Now that Alfred can retrieve guest information, consider how you might enhance t
 
 Now Alfred is fully equipped to handle guest inquiries effortlessly, ensuring your gala is remembered as the most sophisticated and delightful event of the century!
 
-<Tip warning={true}>
+<Tip>
 Try extending the retriver tool to also return conversation starters based on each guest's interests or background. How would you modify the tool to accomplish this?
 
 When you're done, implement your guest retriever tool in the <code>retriever.py</code> file.
