@@ -9,10 +9,13 @@ In this section, we'll combine the guest information retrieval, web search, weat
 Instead of reimplementing all the tools we've created in previous sections, we'll import them from their respective modules which we saved in the `tools.py` and `retriever.py` files.
 
 <Tip>
-If you haven't implemented the tools yet, go back to the [tools](./tools.mdx) and [retriever](./invitees.mdx) sections to implement them, and add them to the `tools.py` and `retriever.py` files.
+If you haven't implemented the tools yet, go back to the <a href="./tools">tools</a> and <a href="./invitees">retriever</a> sections to implement them, and add them to the `tools.py` and `retriever.py` files.
 </Tip>
 
 Let's import the necessary libraries and tools from the previous sections:
+
+<hfoptions id="agents-frameworks">
+<hfoption id="smolagents">
 
 ```python
 # Import necessary libraries
@@ -21,7 +24,7 @@ from smolagents import CodeAgent, HfApiModel
 
 # Import our custom tools from their modules
 from tools import DuckDuckGoSearchTool, WeatherInfoTool, HubStatsTool
-from retriever import GuestInfoRetrieverTool, load_guest_dataset
+from retriever import load_guest_dataset
 ```
 
 Now, let's combine all these tools into a single agent:
@@ -51,6 +54,123 @@ alfred = CodeAgent(
 )
 ```
 
+</hfoption>
+<hfoption id="llama-index">
+
+```python
+# Import necessary libraries
+from llama_index.core.agent.workflow import AgentWorkflow
+from llama_index.llms.huggingface_api import HuggingFaceInferenceAPI
+```
+
+Now, let's combine all these tools into a single agent:
+
+```python
+# Initialize the Hugging Face model
+llm = HuggingFaceInferenceAPI(model_name="Qwen/Qwen2.5-Coder-32B-Instruct")
+
+# Initialize the web search tool
+tool_spec = DuckDuckGoSearchToolSpec()
+search_tool = FunctionTool.from_defaults(tool_spec.duckduckgo_full_search)
+
+# Initialize the weather tool
+weather_info_tool = FunctionTool.from_defaults(get_weather_info)
+
+# Initialize the Hub stats tool
+hub_stats_tool = FunctionTool.from_defaults(get_hub_stats)
+
+# Load the guest dataset and initialize the guest info tool
+guest_info_tool = FunctionTool.from_defaults(get_guest_info_retriever)
+
+# Create Alfred with all the tools
+alfred = AgentWorkflow.from_tools_or_functions(
+    [guest_info_tool, search_tool, weather_info_tool, hub_stats_tool],
+    llm=llm,
+)
+```
+
+</hfoption>
+<hfoption id="langgraph">
+
+```python
+from typing import TypedDict, Annotated, Optional
+from langchain.llms import HuggingFaceHub
+from langgraph.graph.message import add_messages
+from langgraph.graph import StateGraph
+from langchain_core.messages import AnyMessage, HumanMessage, AIMessage
+```
+
+Now, let’s combine all these tools into a single agent:
+
+```python
+class AgentState(TypedDict):
+    response: Optional[str]
+    messages: Annotated[list[AnyMessage], add_messages]
+
+llm = HuggingFaceHub(
+    repo_id="Qwen/Qwen2.5-Coder-32B-Instruct", 
+    huggingfacehub_api_token=HUGGINGFACEHUB_API_TOKEN
+)
+
+def tools_node(data):
+    messages = data["messages"]
+    query = messages[-1].content.strip()
+
+    guest_info_result = guest_info_tool.invoke(query)
+    guest_info_result_cleaned = guest_info_result.lower()
+
+    match = re.search(r"'([^']+)'", query.lower())
+    guest_name = match.group(1).lower() if match else ""
+
+    if guest_name and guest_name in guest_info_result_cleaned:
+        response = guest_info_result
+    elif "weather" in query:
+        location_match = re.search(r"weather.*in\s+([a-zA-Z\s]+)", query)
+        response = weather_info_tool.invoke(location_match.group(1).strip()) if location_match else "Location not found."
+    elif "hugging face" in query:
+        response = hub_stats_tool.invoke(query)
+    else:
+        response = search_tool.invoke(query)
+
+    return {"messages": messages + [AIMessage(content=response)]}
+
+def generate_response(data):
+    messages = data["messages"]
+
+    if messages[-1].content == "No matching guest information found.":
+        return {"messages": messages + [AIMessage(content="I'm sorry, I couldn't find that guest.")]}
+
+    history_text = "\n".join([msg.content for msg in messages])
+    prompt = f"{history_text}\nUse only the info retrieved as source.\n"
+    
+    response_text = llm.invoke(prompt).strip()
+
+    if response_text.startswith(prompt):
+        model_response = response_text[len(prompt):].strip()
+
+    messages.append(AIMessage(content=model_response))
+
+    return {"messages": messages, "response": model_response}
+
+
+builder = StateGraph(AgentState)
+
+builder.add_node("tools_node", tools_node)
+builder.add_node("generate_response", generate_response)
+
+builder.set_entry_point("tools_node")
+builder.add_edge("tools_node", "generate_response")
+
+graph = builder.compile()
+
+# Example query Alfred might receive during the gala
+response = graph.invoke({"messages": "Who is Meta AI and what's their most popular model?"})
+print("🎩 Alfred's Response:")
+print(response["response"])
+```
+</hfoption>
+</hfoptions>
+
 Your agent is now ready to use!
 
 ## Using Alfred: End-to-End Examples
@@ -61,6 +181,9 @@ Now that Alfred is fully equipped with all the necessary tools, let's see how he
 
 Let's see how Alfred can help us with our guest information.
 
+<hfoptions id="agents-frameworks">
+<hfoption id="smolagents">
+
 ```python
 query = "Tell me about Lady Ada Lovelace. What's her background and how is she related to me?"
 response = alfred.run(query)
@@ -70,14 +193,57 @@ print(response)
 ```
 
 Expected output:
+
 ```
 🎩 Alfred's Response:
 Based on the information I retrieved, Lady Ada Lovelace is an esteemed mathematician and friend. She is renowned for her pioneering work in mathematics and computing, often celebrated as the first computer programmer due to her work on Charles Babbage's Analytical Engine. Her email address is ada.lovelace@example.com.
 ```
 
+</hfoption>
+<hfoption id="llama-index">
+
+```python
+query = "Tell me about Lady Ada Lovelace. What's her background?"
+response = await alfred.run(query)
+
+print("🎩 Alfred's Response:")
+print(response.response.blocks[0].text)
+```
+
+Expected output:
+
+```
+🎩 Alfred's Response:
+Lady Ada Lovelace was an English mathematician and writer, best known for her work on Charles Babbage's Analytical Engine. She was the first to recognize that the machine had applications beyond pure calculation.
+```
+
+</hfoption>
+<hfoption id="langgraph">
+
+```python
+response = graph.invoke({"messages": "Tell me about 'Lady Ada Lovelace'. What's her background and how is she related to me?"})
+
+print("🎩 Alfred's Response:")
+print(response["response"])
+```
+
+Expected output:
+
+```
+🎩 Alfred's Response:
+Based on the information provided, Lady Ada Lovelace is a renowned mathematician and is celebrated as the first computer programmer. She worked on Charles Babbage's Analytical Engine, which is considered a precursor to modern computers. Your relation to her is described as "Pioneer in computing," indicating that she is a significant figure in the history of computing. However, the information provided does not give any specific familial or personal connection to you, only a professional one. Her email is listed as ada.lovelace@example.com, but this is likely a fictional address for illustrative purposes.
+```
+
+</hfoption>
+</hfoptions>
+
+
 ### Example 2: Checking the Weather for Fireworks
 
 Let's see how Alfred can help us with the weather.
+
+<hfoptions id="agents-frameworks">
+<hfoption id="smolagents">
 
 ```python
 query = "What's the weather like in Paris tonight? Will it be suitable for our fireworks display?"
@@ -93,9 +259,49 @@ Expected output (will vary due to randomness):
 I've checked the weather in Paris for you. Currently, it's clear with a temperature of 25°C. These conditions are perfect for the fireworks display tonight. The clear skies will provide excellent visibility for the spectacular show, and the comfortable temperature will ensure the guests can enjoy the outdoor event without discomfort.
 ```
 
+</hfoption>
+<hfoption id="llama-index">
+
+```python
+query = "What's the weather like in Paris tonight? Will it be suitable for our fireworks display?"
+response = await alfred.run(query)
+
+print("🎩 Alfred's Response:")
+print(response)
+```
+
+Expected output:
+
+```
+🎩 Alfred's Response:
+The weather in Paris tonight is rainy with a temperature of 15°C. Given the rain, it may not be suitable for a fireworks display.
+```
+
+</hfoption>
+<hfoption id="langgraph">
+
+```python
+response = graph.invoke({"messages": "What's the weather like in Paris tonight? Will it be suitable for our fireworks display?"})
+
+print("🎩 Alfred's Response:")
+print(response["response"])
+```
+
+Expected output:
+
+```
+🎩 Alfred's Response:
+Based on the information provided, the weather in Paris tonight is windy with a temperature of 20°C. While the temperature seems suitable for a fireworks display, the wind could pose a challenge. It might be advisable to monitor the wind conditions closer to the event time to ensure the safety and quality of the fireworks display.
+```
+</hfoption>
+</hfoptions>
+
 ### Example 3: Impressing AI Researchers
 
 Let's see how Alfred can help us impress AI researchers.
+
+<hfoptions id="agents-frameworks">
+<hfoption id="smolagents">
 
 ```python
 query = "One of our guests is from Anthropic. What can you tell me about their most popular model?"
@@ -106,14 +312,54 @@ print(response)
 ```
 
 Expected output:
+
 ```
 🎩 Alfred's Response:
 I've looked up information about Anthropic's models. The most downloaded model by Anthropic is claude-3-haiku-20240307, which has received over 1,200,000 downloads. This is their lightweight, fastest, and most efficient model in the Claude 3 family. It would be a great conversation starter to mention this to your guests from Anthropic, perhaps asking them about their latest research or the capabilities of their Claude models.
 ```
 
+</hfoption>
+<hfoption id="llama-index">
+
+```python
+query = "One of our guests is from Google. What can you tell me about their most popular model?"
+response = await alfred.run(query)
+
+print("🎩 Alfred's Response:")
+print(response)
+```
+
+Expected output:
+
+```
+🎩 Alfred's Response:
+The most popular model by Google on the Hugging Face Hub is google/electra-base-discriminator, with 28,546,752 downloads.
+```
+
+</hfoption>
+<hfoption id="langgraph">
+```python
+response = graph.invoke({"messages": "One of our guests is from Anthropic. What can you tell me about their most popular model?"})
+
+print("🎩 Alfred's Response:")
+print(response["response"])
+```
+
+Expected output:
+
+```
+🎩 Alfred's Response:
+Based on the information provided, Anthropic's most popular model appears to be Claude 3.5 Sonnet. This model is described as being faster and cheaper than their previous flagship model, Claude 3 Opus. It is also noted that Claude 3.5 Sonnet can use a computer like a human would, and it has been released in beta mode. However, there is some confusion in the provided information as it also mentions Claude 3.7 Sonnet, which is described as being able to "think" about questions for as long as users want it to. It is unclear whether Claude 3.5 Sonnet or Claude 3.7 Sonnet is Anthropic's most popular model based on the given information. The most recent and clear information points to Claude 3.5 Sonnet as Anthropic's latest model with improved performance and cost-effectiveness.
+```
+</hfoption>
+</hfoptions>
+
 ### Example 4: Combining Multiple Tools
 
 Let's see how Alfred can help us prepare for a conversation with Dr. Nikola Tesla.
+
+<hfoptions id="agents-frameworks">
+<hfoption id="smolagents">
 
 ```python
 query = "I need to speak with Dr. Nikola Tesla about recent advancements in wireless energy. Can you help me prepare for this conversation?"
@@ -124,6 +370,7 @@ print(response)
 ```
 
 Expected output:
+
 ```
 🎩 Alfred's Response:
 I've gathered information to help you prepare for your conversation with Dr. Nikola Tesla.
@@ -148,9 +395,78 @@ Conversation Starters:
 This should give you plenty to discuss with Dr. Tesla while demonstrating your knowledge of his interests and recent developments in his field.
 ```
 
+</hfoption>
+<hfoption id="llama-index">
+
+```python
+query = "I need to speak with Dr. Nikola Tesla about recent advancements in wireless energy. Can you help me prepare for this conversation?"
+response = await alfred.run(query)
+
+print("🎩 Alfred's Response:")
+print(response)
+```
+
+Expected output:
+
+```
+🎩 Alfred's Response:
+Here are some recent advancements in wireless energy that you might find useful for your conversation with Dr. Nikola Tesla:
+
+1. **Advancements and Challenges in Wireless Power Transfer**: This article discusses the evolution of wireless power transfer (WPT) from conventional wired methods to modern applications, including solar space power stations. It highlights the initial focus on microwave technology and the current demand for WPT due to the rise of electric devices.
+
+2. **Recent Advances in Wireless Energy Transfer Technologies for Body-Interfaced Electronics**: This article explores wireless energy transfer (WET) as a solution for powering body-interfaced electronics without the need for batteries or lead wires. It discusses the advantages and potential applications of WET in this context.
+
+3. **Wireless Power Transfer and Energy Harvesting: Current Status and Future Trends**: This article provides an overview of recent advances in wireless power supply methods, including energy harvesting and wireless power transfer. It presents several promising applications and discusses future trends in the field.
+
+4. **Wireless Power Transfer: Applications, Challenges, Barriers, and the
+```
+
+</hfoption>
+<hfoption id="langgraph">
+```python
+response = graph.invoke({"messages":"I need to speak with 'Dr. Nikola Tesla' about recent advancements in wireless energy. Can you help me prepare for this conversation?"})
+
+print("🎩 Alfred's Response:")
+print(response["response"])
+```
+
+Expected output:
+
+```
+🎩 Alfred's Response:
+Certainly! Here’s a draft for your email to Dr. Nikola Tesla:
+
+---
+
+Subject: Exciting Developments in Wireless Energy Transmission
+
+Dear Dr. Tesla,
+
+I hope this email finds you well. It’s been so long since we last caught up at the university, and I’ve been following your incredible work with great interest. I recently came across your latest patent on wireless energy transmission and I’m absolutely fascinated by the potential it holds for the future.
+
+I would love to discuss your recent advancements in more detail. Your innovative approach to solving some of the world’s most pressing energy challenges is truly inspiring. I believe there’s a lot we can learn from each other, and I’d be honored to hear more about your vision and the challenges you’ve faced during the development of this technology.
+
+On a lighter note, I remember you had a particular fondness for pigeons. I’ve been reading up on some recent studies on pigeon behavior and thought we could perhaps share some interesting insights on that topic as well. It would be a pleasure to catch up on both our professional and personal interests.
+
+Looking forward to your response.
+
+Best regards,
+
+[Your Name]
+
+---
+
+Feel free to adjust the tone and content as you see fit!
+```
+</hfoption>
+</hfoptions>
+
 ## Advanced Features: Conversation Memory
 
 To make Alfred even more helpful during the gala, we can enable conversation memory so he remembers previous interactions:
+
+<hfoptions id="agents-frameworks">
+<hfoption id="smolagents">
 
 ```python
 # Create Alfred with conversation memory
@@ -172,6 +488,50 @@ response2 = alfred_with_memory.run("What projects is she currently working on?")
 print("🎩 Alfred's Second Response:")
 print(response2)
 ```
+
+</hfoption>
+<hfoption id="llama-index">
+
+```python
+from llama_index.core.workflow import Context
+
+alfred = AgentWorkflow.from_tools_or_functions(
+    [guest_info_tool, search_tool, weather_info_tool, hub_stats_tool],
+    llm=llm
+)
+
+# Remembering state
+ctx = Context(alfred)
+
+# First interaction
+response1 = await alfred.run("Tell me about Lady Ada Lovelace.", ctx=ctx)
+print("🎩 Alfred's First Response:")
+print(response1)
+
+# Second interaction (referencing the first)
+response2 = await alfred.run("What projects is she currently working on?", ctx=ctx)
+print("🎩 Alfred's Second Response:")
+print(response2)
+```
+
+</hfoption>
+<hfoption id="langgraph">
+
+```python
+response = graph.invoke({"messages": [HumanMessage(content="Tell me about 'Lady Ada Lovelace'. What's her background and how is she related to me?")]})
+
+print("🎩 Alfred's Response:")
+print(response["response"])
+print()
+
+response = graph.invoke({"messages": response["messages"] + [HumanMessage(content="What projects is she currently working on?")]})
+
+print("🎩 Alfred's Response:")
+print(response["response"])
+```
+
+</hfoption>
+</hfoptions>
 
 ## Conclusion
 
