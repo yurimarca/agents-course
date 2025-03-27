@@ -93,80 +93,63 @@ alfred = AgentWorkflow.from_tools_or_functions(
 <hfoption id="langgraph">
 
 ```python
-from typing import TypedDict, Annotated, Optional
-from langchain.llms import HuggingFaceHub
+from typing import TypedDict, Annotated
 from langgraph.graph.message import add_messages
-from langgraph.graph import StateGraph
 from langchain_core.messages import AnyMessage, HumanMessage, AIMessage
+from langgraph.prebuilt import ToolNode
+from langgraph.graph import START, StateGraph
+from langgraph.prebuilt import tools_condition
+from langchain_huggingface import HuggingFaceEndpoint, ChatHuggingFace
+
+from tools import DuckDuckGoSearchTool, weather_info_tool, hub_stats_tool
+from retriever import load_guest_dataset
 ```
 
 Now, let’s combine all these tools into a single agent:
 
 ```python
-class AgentState(TypedDict):
-    response: Optional[str]
-    messages: Annotated[list[AnyMessage], add_messages]
+# Initialize the web search tool
+search_tool = DuckDuckGoSearchTool()
 
-llm = HuggingFaceHub(
-    repo_id="Qwen/Qwen2.5-Coder-32B-Instruct", 
-    huggingfacehub_api_token=HUGGINGFACEHUB_API_TOKEN
+# Load the guest dataset and initialize the guest info tool
+guest_info_tool = load_guest_dataset()
+
+# Generate the chat interface, including the tools
+llm = HuggingFaceEndpoint(
+    repo_id="Qwen/Qwen2.5-Coder-32B-Instruct",
+    huggingfacehub_api_token=HUGGINGFACEHUB_API_TOKEN,
 )
 
-def tools_node(data):
-    messages = data["messages"]
-    query = messages[-1].content.strip()
+chat = ChatHuggingFace(llm=llm, verbose=True)
+tools = [guest_info_tool, search_tool, weather_info_tool, hub_stats_tool]
+chat_with_tools = chat.bind_tools(tools)
 
-    guest_info_result = guest_info_tool.invoke(query)
-    guest_info_result_cleaned = guest_info_result.lower()
+# Generate the AgentState and Agent graph
+class AgentState(TypedDict):
+    messages: Annotated[list[AnyMessage], add_messages]
 
-    match = re.search(r"'([^']+)'", query.lower())
-    guest_name = match.group(1).lower() if match else ""
+def assistant(state: AgentState):
+    return {
+        "messages": [chat_with_tools.invoke(state["messages"])],
+    }
 
-    if guest_name and guest_name in guest_info_result_cleaned:
-        response = guest_info_result
-    elif "weather" in query:
-        location_match = re.search(r"weather.*in\s+([a-zA-Z\s]+)", query)
-        response = weather_info_tool.invoke(location_match.group(1).strip()) if location_match else "Location not found."
-    elif "hugging face" in query:
-        response = hub_stats_tool.invoke(query)
-    else:
-        response = search_tool.invoke(query)
-
-    return {"messages": messages + [AIMessage(content=response)]}
-
-def generate_response(data):
-    messages = data["messages"]
-
-    if messages[-1].content == "No matching guest information found.":
-        return {"messages": messages + [AIMessage(content="I'm sorry, I couldn't find that guest.")]}
-
-    history_text = "\n".join([msg.content for msg in messages])
-    prompt = f"{history_text}\nUse only the info retrieved as source.\n"
-    
-    response_text = llm.invoke(prompt).strip()
-
-    if response_text.startswith(prompt):
-        model_response = response_text[len(prompt):].strip()
-
-    messages.append(AIMessage(content=model_response))
-
-    return {"messages": messages, "response": model_response}
-
-
+## The graph
 builder = StateGraph(AgentState)
 
-builder.add_node("tools_node", tools_node)
-builder.add_node("generate_response", generate_response)
+# Define nodes: these do the work
+builder.add_node("assistant", assistant)
+builder.add_node("tools", ToolNode(tools))
 
-builder.set_entry_point("tools_node")
-builder.add_edge("tools_node", "generate_response")
-
-graph = builder.compile()
-
-# Example query Alfred might receive during the gala
-response = graph.invoke({"messages": "Who is Meta AI and what's their most popular model?"})
-print("🎩 Alfred's Response:")
-print(response["response"])
+# Define edges: these determine how the control flow moves
+builder.add_edge(START, "assistant")
+builder.add_conditional_edges(
+    "assistant",
+    # If the latest message requires a tool, route to tools
+    # Otherwise, provide a direct response
+    tools_condition,
+)
+builder.add_edge("tools", "assistant")
+alfred = builder.compile()
 ```
 </hfoption>
 </hfoptions>
@@ -221,17 +204,17 @@ Lady Ada Lovelace was an English mathematician and writer, best known for her wo
 <hfoption id="langgraph">
 
 ```python
-response = graph.invoke({"messages": "Tell me about 'Lady Ada Lovelace'. What's her background and how is she related to me?"})
+response = alfred.invoke({"messages": "Tell me about 'Lady Ada Lovelace'. What's her background and how is she related to me?"})
 
 print("🎩 Alfred's Response:")
-print(response["response"])
+print(response['messages'][-1].content)
 ```
 
 Expected output:
 
 ```
 🎩 Alfred's Response:
-Based on the information provided, Lady Ada Lovelace is a renowned mathematician and is celebrated as the first computer programmer. She worked on Charles Babbage's Analytical Engine, which is considered a precursor to modern computers. Your relation to her is described as "Pioneer in computing," indicating that she is a significant figure in the history of computing. However, the information provided does not give any specific familial or personal connection to you, only a professional one. Her email is listed as ada.lovelace@example.com, but this is likely a fictional address for illustrative purposes.
+Ada Lovelace was an English mathematician and writer, known for her work on Charles Babbage's Analytical Engine, which is considered a precursor to the modern computer. She is recognized as the first computer programmer because of her program for calculating Bernoulli numbers. Born as Augusta Ada King, Countess of Lovelace, she married William King, 8th Baron King, in 1835, becoming Lady Lovelace. They had three children together. Ada Lovelace Day is celebrated annually to honor women's contributions to science and technology. However, there is no direct relation provided in the information suggesting a connection to you.
 ```
 
 </hfoption>
@@ -281,17 +264,17 @@ The weather in Paris tonight is rainy with a temperature of 15°C. Given the rai
 <hfoption id="langgraph">
 
 ```python
-response = graph.invoke({"messages": "What's the weather like in Paris tonight? Will it be suitable for our fireworks display?"})
+response = alfred.invoke({"messages": "What's the weather like in Paris tonight? Will it be suitable for our fireworks display?"})
 
 print("🎩 Alfred's Response:")
-print(response["response"])
+print(response['messages'][-1].content)
 ```
 
 Expected output:
 
 ```
 🎩 Alfred's Response:
-Based on the information provided, the weather in Paris tonight is windy with a temperature of 20°C. While the temperature seems suitable for a fireworks display, the wind could pose a challenge. It might be advisable to monitor the wind conditions closer to the event time to ensure the safety and quality of the fireworks display.
+The weather in Paris tonight is rainy with a temperature of 15°C, which may not be suitable for your fireworks display.
 ```
 </hfoption>
 </hfoptions>
@@ -339,17 +322,17 @@ The most popular model by Google on the Hugging Face Hub is google/electra-base-
 </hfoption>
 <hfoption id="langgraph">
 ```python
-response = graph.invoke({"messages": "One of our guests is from Anthropic. What can you tell me about their most popular model?"})
+response = alfred.invoke({"messages": "One of our guests is from Qwen. What can you tell me about their most popular model?"})
 
 print("🎩 Alfred's Response:")
-print(response["response"])
+print(response['messages'][-1].content)
 ```
 
 Expected output:
 
 ```
 🎩 Alfred's Response:
-Based on the information provided, Anthropic's most popular model appears to be Claude 3.5 Sonnet. This model is described as being faster and cheaper than their previous flagship model, Claude 3 Opus. It is also noted that Claude 3.5 Sonnet can use a computer like a human would, and it has been released in beta mode. However, there is some confusion in the provided information as it also mentions Claude 3.7 Sonnet, which is described as being able to "think" about questions for as long as users want it to. It is unclear whether Claude 3.5 Sonnet or Claude 3.7 Sonnet is Anthropic's most popular model based on the given information. The most recent and clear information points to Claude 3.5 Sonnet as Anthropic's latest model with improved performance and cost-effectiveness.
+The most downloaded model by Qwen is Qwen/Qwen2.5-VL-7B-Instruct with 3,313,345 downloads.
 ```
 </hfoption>
 </hfoptions>
@@ -423,40 +406,18 @@ Here are some recent advancements in wireless energy that you might find useful 
 
 </hfoption>
 <hfoption id="langgraph">
+
 ```python
-response = graph.invoke({"messages":"I need to speak with 'Dr. Nikola Tesla' about recent advancements in wireless energy. Can you help me prepare for this conversation?"})
+response = alfred.invoke({"messages":"I need to speak with 'Dr. Nikola Tesla' about recent advancements in wireless energy. Can you help me prepare for this conversation?"})
 
 print("🎩 Alfred's Response:")
-print(response["response"])
+print(response['messages'][-1].content)
 ```
 
 Expected output:
 
 ```
-🎩 Alfred's Response:
-Certainly! Here’s a draft for your email to Dr. Nikola Tesla:
-
----
-
-Subject: Exciting Developments in Wireless Energy Transmission
-
-Dear Dr. Tesla,
-
-I hope this email finds you well. It’s been so long since we last caught up at the university, and I’ve been following your incredible work with great interest. I recently came across your latest patent on wireless energy transmission and I’m absolutely fascinated by the potential it holds for the future.
-
-I would love to discuss your recent advancements in more detail. Your innovative approach to solving some of the world’s most pressing energy challenges is truly inspiring. I believe there’s a lot we can learn from each other, and I’d be honored to hear more about your vision and the challenges you’ve faced during the development of this technology.
-
-On a lighter note, I remember you had a particular fondness for pigeons. I’ve been reading up on some recent studies on pigeon behavior and thought we could perhaps share some interesting insights on that topic as well. It would be a pleasure to catch up on both our professional and personal interests.
-
-Looking forward to your response.
-
-Best regards,
-
-[Your Name]
-
----
-
-Feel free to adjust the tone and content as you see fit!
+Based on the provided information, here are key points to prepare for the conversation with 'Dr. Nikola Tesla' about recent advancements in wireless energy:\n1. **Wireless Power Transmission (WPT):** Discuss how WPT revolutionizes energy transfer by eliminating the need for cords and leveraging mechanisms like inductive and resonant coupling.\n2. **Advancements in Wireless Charging:** Highlight improvements in efficiency, faster charging speeds, and the rise of Qi/Qi2 certified wireless charging solutions.\n3. **5G-Advanced Innovations and NearLink Wireless Protocol:** Mention these as developments that enhance speed, security, and efficiency in wireless networks, which can support advanced wireless energy technologies.\n4. **AI and ML at the Edge:** Talk about how AI and machine learning will rely on wireless networks to bring intelligence to the edge, enhancing automation and intelligence in smart homes and buildings.\n5. **Matter, Thread, and Security Advancements:** Discuss these as key innovations that drive connectivity, efficiency, and security in IoT devices and systems.\n6. **Breakthroughs in Wireless Charging Technology:** Include any recent breakthroughs or studies, such as the one from Incheon National University, to substantiate the advancements in wireless charging.
 ```
 </hfoption>
 </hfoptions>
@@ -518,16 +479,19 @@ print(response2)
 <hfoption id="langgraph">
 
 ```python
-response = graph.invoke({"messages": [HumanMessage(content="Tell me about 'Lady Ada Lovelace'. What's her background and how is she related to me?")]})
+# First interaction
+response = alfred.invoke({"messages": [HumanMessage(content="Tell me about 'Lady Ada Lovelace'. What's her background and how is she related to me?")]})
+
 
 print("🎩 Alfred's Response:")
-print(response["response"])
+print(response['messages'][-1].content)
 print()
 
-response = graph.invoke({"messages": response["messages"] + [HumanMessage(content="What projects is she currently working on?")]})
+# Second interaction (referencing the first)
+response = alfred.invoke({"messages": response["messages"] + [HumanMessage(content="What projects is she currently working on?")]})
 
 print("🎩 Alfred's Response:")
-print(response["response"])
+print(response['messages'][-1].content)
 ```
 
 </hfoption>

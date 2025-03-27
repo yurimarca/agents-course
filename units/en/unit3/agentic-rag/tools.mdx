@@ -68,7 +68,7 @@ print(results)
 Expected output:
 
 ```
-The current President of France in Emmanuel Macron.
+Emmanuel Macron (born December 21, 1977, Amiens, France) is a French banker and politician who was elected president of France in 2017...
 ```
 
 </hfoption>
@@ -138,8 +138,6 @@ def get_weather_info(location: str) -> str:
 
 # Initialize the tool
 weather_info_tool = FunctionTool.from_defaults(get_weather_info)
-
-print(weather_info_tool('Paris'))
 ```
 
 </hfoption>
@@ -161,13 +159,12 @@ def get_weather_info(location: str) -> str:
     data = random.choice(weather_conditions)
     return f"Weather in {location}: {data['condition']}, {data['temp_c']}°C"
 
+# Initialize the tool
 weather_info_tool = Tool(
     name="get_weather_info",
     func=get_weather_info,
     description="Fetches dummy weather information for a given location."
 )
-
-print(weather_info_tool.invoke('Paris'))
 ```
 
 </hfoption>
@@ -366,75 +363,63 @@ Facebook is a social networking service and technology company based in Menlo Pa
 <hfoption id="langgraph">
 
 ```python
-from typing import TypedDict, Annotated, Optional
-from langchain.llms import HuggingFaceHub
+from typing import TypedDict, Annotated
 from langgraph.graph.message import add_messages
-from langgraph.graph import StateGraph
 from langchain_core.messages import AnyMessage, HumanMessage, AIMessage
+from langgraph.prebuilt import ToolNode
+from langgraph.graph import START, StateGraph
+from langgraph.prebuilt import tools_condition
+from langchain_huggingface import HuggingFaceEndpoint, ChatHuggingFace
 
-class AgentState(TypedDict):
-    response: Optional[str]
-    messages: Annotated[list[AnyMessage], add_messages]
-
-llm = HuggingFaceHub(
-    repo_id="Qwen/Qwen2.5-Coder-32B-Instruct", 
-    huggingfacehub_api_token=HUGGINGFACEHUB_API_TOKEN
+# Generate the chat interface, including the tools
+llm = HuggingFaceEndpoint(
+    repo_id="Qwen/Qwen2.5-Coder-32B-Instruct",
+    huggingfacehub_api_token=HUGGINGFACEHUB_API_TOKEN,
 )
 
-def tools_node(data):
-    messages = data["messages"]
-    query = messages[-1].content.strip()
-    
-    if "weather" in query:
-        location_match = re.search(r"weather.*in\s+([a-zA-Z\s]+)", query)
-        response = weather_info_tool.invoke(location_match.group(1).strip()) if location_match else "Location not found."
-    elif "hugging face" in query.lower():
-        if "facebook" in query.lower(): response = hub_stats_tool.invoke("facebook")
-        elif "google" in query.lower(): response = hub_stats_tool.invoke("google")
-        else: response = "Org not found."
-    else:
-        response = search_tool.invoke(query)
+chat = ChatHuggingFace(llm=llm, verbose=True)
+tools = [search_tool, weather_info_tool, hub_stats_tool]
+chat_with_tools = chat.bind_tools(tools)
 
-    return {"messages": messages + [AIMessage(content=response)]}
+# Generate the AgentState and Agent graph
+class AgentState(TypedDict):
+    messages: Annotated[list[AnyMessage], add_messages]
 
+def assistant(state: AgentState):
+    return {
+        "messages": [chat_with_tools.invoke(state["messages"])],
+    }
 
-def generate_response(data):
-    messages = data["messages"]
-
-    history_text = "\n".join([msg.content for msg in messages])
-    prompt = f"{history_text}\nUse only the info retrieved as source.\n"
-    
-    response_text = llm.invoke(prompt).strip()
-
-    if response_text.startswith(prompt):
-        model_response = response_text[len(prompt):].strip()
-
-    messages.append(AIMessage(content=model_response))
-
-    return {"messages": messages, "response": model_response}
-
-
+## The graph
 builder = StateGraph(AgentState)
 
-builder.add_node("tools_node", tools_node)
-builder.add_node("generate_response", generate_response)
+# Define nodes: these do the work
+builder.add_node("assistant", assistant)
+builder.add_node("tools", ToolNode(tools))
 
-builder.set_entry_point("tools_node")
-builder.add_edge("tools_node", "generate_response")
+# Define edges: these determine how the control flow moves
+builder.add_edge(START, "assistant")
+builder.add_conditional_edges(
+    "assistant",
+    # If the latest message requires a tool, route to tools
+    # Otherwise, provide a direct response
+    tools_condition,
+)
+builder.add_edge("tools", "assistant")
+alfred = builder.compile()
 
-graph = builder.compile()
+messages = [HumanMessage(content="Who is Facebook and what's their most popular model?")]
+response = alfred.invoke({"messages": messages})
 
-# Example query Alfred might receive during the gala
-response = graph.invoke({"messages": "What is Facebook and what's their most popular model on the Hugging Face Hub?"})
 print("🎩 Alfred's Response:")
-print(response["response"])
+print(response['messages'][-1].content)
 ```
 
 Expected output:
 
 ```
 🎩 Alfred's Response:
-According to the company, Meta AI is set to become the world's most widely used AI assistant by the end of the year. Over 400 million people interact with Meta AI monthly, with 185 million using ... Designed to make AI accessible to everyone, the AI model is built on Meta's open-source Llama 3.2 and works across the company's ecosystem allowing users to create, interact, and benefit from AI ... We tried seven of the most popular AI chatbots (ChatGPT, Claude, Grok, Perplexity and Arc Search, Meta AI, Microsoft Copilot) to find out. ... It uses a mix of models to produce its responses ... Yet, the difference is that Meta AI, the chatbot, integrated across Meta's social media platforms, has surpassed 500 million users since its wide release in April 2024. The rise of Meta AI. Meta AI's ascent to 500 million users in just seven months is a testament to its accessibility and utility. Impact of Meta AI on the Metaverse and VR/AR; History of Meta AI. Meta AI started as Facebook AI, focusing on AI research and innovation. In 2021, when Facebook rebranded to Meta, the scope of AI expanded further. Meta AI has made significant advancements in NLP (Natural Language Processing), computer vision, and deep learning. Use Cases of Meta AI
+Facebook is a social media company known for its social networking site, Facebook, as well as other services like Instagram and WhatsApp. The most downloaded model by Facebook on the Hugging Face Hub is facebook/esmfold_v1 with 13,202,321 downloads.
 ```
 </hfoption>
 </hfoptions>

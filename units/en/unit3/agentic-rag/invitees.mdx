@@ -15,9 +15,10 @@ This is where Retrieval Augmented Generation (RAG) shines! By combining a retrie
 
 ## Setting up our application
 
-In this unit, we'll develop our agent within a structured Python project. This approach helps us maintain clean, modular code by organizing different functionalities into separate files.  
+In this unit, we'll develop our agent within a HF Space, as an structured Python project. This approach helps us maintain clean, modular code by organizing different functionalities into separate files.  
 
-### Project Structure  
+### Project Structure
+
 - **`tools.py`** – Provides auxiliary tools for the agent.  
 - **`retriever.py`** – Implements retrieval functions to support knowledge access.  
 - **`app.py`** – Integrates all components into a fully functional agent, which we'll finalize in the last part of this unit.  
@@ -236,7 +237,7 @@ guest_info_tool = FunctionTool.from_defaults(get_guest_info_retriever)
 ```
 
 Let's understand this tool step-by-step. 
-- The docstring help the agent understand when and how to use this tool
+- The docstring helps the agent understand when and how to use this tool
 - The type decorators define what parameters the tool expects (in this case, a search query)
 - We're using a `BM25Retriever`, which is a powerful text retrieval algorithm that doesn't require embeddings
 - The method processes the query and returns the most relevant guest information
@@ -272,7 +273,7 @@ guest_info_tool = Tool(
 ```
 
 Let's understand this tool step-by-step. 
-- The docstring help the agent understand when and how to use this tool
+- The `name` and `description` help the agent understand when and how to use this tool
 - The type decorators define what parameters the tool expects (in this case, a search query)
 - We're using a `BM25Retriever`, which is a powerful text retrieval algorithm that doesn't require embeddings
 - The method processes the query and returns the most relevant guest information
@@ -355,85 +356,68 @@ What's happening in this final step:
 <hfoption id="langgraph">
 
 ```python
-from typing import TypedDict, Annotated, Optional
-from langchain.llms import HuggingFaceHub
+from typing import TypedDict, Annotated
 from langgraph.graph.message import add_messages
-from langgraph.graph import StateGraph
 from langchain_core.messages import AnyMessage, HumanMessage, AIMessage
-import re
+from langgraph.prebuilt import ToolNode
+from langgraph.graph import START, StateGraph
+from langgraph.prebuilt import tools_condition
+from langchain_huggingface import HuggingFaceEndpoint, ChatHuggingFace
 
-class AgentState(TypedDict):
-    response: Optional[str]
-    messages: Annotated[list[AnyMessage], add_messages]
-
-llm = HuggingFaceHub(
-    repo_id="Qwen/Qwen2.5-Coder-32B-Instruct", 
-    huggingfacehub_api_token=HUGGINGFACEHUB_API_TOKEN
+# Generate the chat interface, including the tools
+llm = HuggingFaceEndpoint(
+    repo_id="Qwen/Qwen2.5-Coder-32B-Instruct",
+    huggingfacehub_api_token=HUGGINGFACEHUB_API_TOKEN,
 )
 
-def tools_node(data):
-    messages = data["messages"]
-    query = messages[-1].content.strip()
+chat = ChatHuggingFace(llm=llm, verbose=True)
+tools = [guest_info_tool]
+chat_with_tools = chat.bind_tools(tools)
 
-    guest_info_result = guest_info_tool.invoke(query)
-    guest_info_result_cleaned = guest_info_result.lower()
+# Generate the AgentState and Agent graph
+class AgentState(TypedDict):
+    messages: Annotated[list[AnyMessage], add_messages]
 
-    match = re.search(r"'([^']+)'", query.lower())
-    guest_name = match.group(1).lower() if match else ""
+def assistant(state: AgentState):
+    return {
+        "messages": [chat_with_tools.invoke(state["messages"])],
+    }
 
-    if guest_name and guest_name in guest_info_result_cleaned:
-        response = guest_info_result
-    else:
-        response = "I'm sorry, I couldn't find that guest."
-
-    return {"messages": messages + [AIMessage(content=response)]}
-
-def generate_response(data):
-    messages = data["messages"]
-
-    if messages[-1].content == "No matching guest information found.":
-        return {"messages": messages + [AIMessage(content="I'm sorry, I couldn't find that guest.")]}
-
-    history_text = "\n".join([msg.content for msg in messages])
-    prompt = f"{history_text}\nUse only the info retrieved as source.\n"
-    
-    response_text = llm.invoke(prompt).strip()
-
-    if response_text.startswith(prompt):
-        model_response = response_text[len(prompt):].strip()
-
-    messages.append(AIMessage(content=model_response))
-
-    return {"messages": messages, "response": model_response}
-
-
+## The graph
 builder = StateGraph(AgentState)
 
-builder.add_node("tools_node", tools_node)
-builder.add_node("generate_response", generate_response)
+# Define nodes: these do the work
+builder.add_node("assistant", assistant)
+builder.add_node("tools", ToolNode(tools))
 
-builder.set_entry_point("tools_node")
-builder.add_edge("tools_node", "generate_response")
+# Define edges: these determine how the control flow moves
+builder.add_edge(START, "assistant")
+builder.add_conditional_edges(
+    "assistant",
+    # If the latest message requires a tool, route to tools
+    # Otherwise, provide a direct response
+    tools_condition,
+)
+builder.add_edge("tools", "assistant")
+alfred = builder.compile()
 
-graph = builder.compile()
-
-query = "Tell me about our guest named 'Lady Ada Lovelace'."
-response = graph.invoke({"messages": query})
+messages = [HumanMessage(content="Tell me about our guest named 'Lady Ada Lovelace'.")]
+response = alfred.invoke({"messages": messages})
 
 print("🎩 Alfred's Response:")
-print(response['messages'][2].content)
+print(messages['messages'][-1].content)
 ```
 
 Expected output:
 
 ```
 🎩 Alfred's Response:
-Based on the information provided, Lady Ada Lovelace is a notable mathematician and is celebrated for her significant contributions to the field of computing. She is particularly recognized as the first computer programmer for her work on Charles Babbage's Analytical Engine. Her relation to you is described as a friend, and her contact information includes the email address ada.lovelace@example.com.
+Lady Ada Lovelace is an esteemed mathematician and pioneer in computing, often celebrated as the first computer programmer due to her work on Charles Babbage's Analytical Engine.
 ```
 
 What's happening in this final step:
-- We initialize a Hugging Face model using the `HuggingFaceHub` class
-- We create our agent (Alfred) as a `StateGraph`, that combines 2 nodes (`search_guest`, `generate_response`) using an edge
+- We initialize a Hugging Face model using the `HuggingFaceEndpoint` class. We also generate a chat interface and append the tools.
+- We create our agent (Alfred) as a `StateGraph`, that combines 2 nodes (`assistant`, `tools`) using an edge
 - We ask Alfred to retrieve information about a guest named "Lady Ada Lovelace"
 
 </hfoption>
