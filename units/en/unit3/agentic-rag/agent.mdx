@@ -61,6 +61,9 @@ alfred = CodeAgent(
 # Import necessary libraries
 from llama_index.core.agent.workflow import AgentWorkflow
 from llama_index.llms.huggingface_api import HuggingFaceInferenceAPI
+
+from tools import search_tool, weather_info_tool, hub_stats_tool
+from retriever import guest_info_tool
 ```
 
 Now, let's combine all these tools into a single agent:
@@ -68,19 +71,6 @@ Now, let's combine all these tools into a single agent:
 ```python
 # Initialize the Hugging Face model
 llm = HuggingFaceInferenceAPI(model_name="Qwen/Qwen2.5-Coder-32B-Instruct")
-
-# Initialize the web search tool
-tool_spec = DuckDuckGoSearchToolSpec()
-search_tool = FunctionTool.from_defaults(tool_spec.duckduckgo_full_search)
-
-# Initialize the weather tool
-weather_info_tool = FunctionTool.from_defaults(get_weather_info)
-
-# Initialize the Hub stats tool
-hub_stats_tool = FunctionTool.from_defaults(get_hub_stats)
-
-# Load the guest dataset and initialize the guest info tool
-guest_info_tool = FunctionTool.from_defaults(get_guest_info_retriever)
 
 # Create Alfred with all the tools
 alfred = AgentWorkflow.from_tools_or_functions(
