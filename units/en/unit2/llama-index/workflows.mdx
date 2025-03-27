@@ -29,7 +29,7 @@ You can follow the code in <a href="https://huggingface.co/agents-course/noteboo
 
 <details>
 <summary>Install the Workflow package</summary>
-As introduced in the [section on the LlamaHub](llama-hub), we can install the Workflow package with the following command:
+As introduced in the <a href="./llama-hub">section on the LlamaHub</a>, we can install the Workflow package with the following command:
 
 ```python
 pip install llama-index-utils-workflow
@@ -153,16 +153,16 @@ from llama_index.core.workflow import Context, StartEvent, StopEvent
 
 @step
 async def query(self, ctx: Context, ev: StartEvent) -> StopEvent:
-    # store in context
+    # store query in the context
     await ctx.set("query", "What is the capital of France?")
 
     # do something with context and event
     val = ...
 
-    # retrieve from context
+    # retrieve query from the context
     query = await ctx.get("query")
 
-    return StopEvent(result=result)
+    return StopEvent(result=val)
 ```
 
 Great! Now you know how to create basic workflows in LlamaIndex!
