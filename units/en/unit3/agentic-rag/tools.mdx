@@ -1,7 +1,7 @@
 # Building and Integrating Tools for Your Agent
 
 In this section, we'll grant Alfred access to the web, enabling him to find the latest news and global updates. 
-Additionally, he'll have access to weather data and model download statistics.
+Additionally, he'll have access to weather data and Hugging Face hub model download statistics, so that he can make relevant conversation about fresh topics.
 
 ## Give Your Agent Access to the Web
 
@@ -76,7 +76,7 @@ Emmanuel Macron (born December 21, 1977, Amiens, France) is a French banker and 
 
 ## Creating a Custom Tool for Weather Information to Schedule the Fireworks
 
-Remember that we need to make sure the fireworks are not cancelled due to bad weather?
+The perfect gala would have fireworks over a clear sky, se need to make sure the fireworks are not cancelled due to bad weather.
 
 Let's create a custom tool that can be used to call an external weather API and get the weather information for a given location.
 
@@ -172,7 +172,7 @@ weather_info_tool = Tool(
 
 ## Creating a Hub Stats Tool for Influential AI Builders
 
-Alfred can impress influential AI builders by discussing their most popular models. We'll create a tool to fetch model statistics from the Hugging Face Hub based on a username.
+In attendance at the gala are the who's who of AI builders. Alfred wants to impress them by discussing their most popular models, datasets, and spaces. We'll create a tool to fetch model statistics from the Hugging Face Hub based on a username.
 
 <hfoptions id="agents-frameworks">
 <hfoption id="smolagents">
