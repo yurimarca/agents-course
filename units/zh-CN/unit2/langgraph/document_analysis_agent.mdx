@@ -1,28 +1,27 @@
-# Document Analysis Graph
+# 文档分析图
 
-Alfred at your service. As Mr. Wayne's trusted butler, I've taken the liberty of documenting how I assist Mr Wayne with his various documentary needs. While he's out attending to his... nighttime activities, I ensure all his paperwork, training schedules, and nutritional plans are properly analyzed and organized.
+Alfred 为您服务。作为韦恩先生值得信赖的管家，我已记录下协助处理各类文档需求的工作流程。当 Mr Wayne 外出进行...夜间活动时，我会确保所有文件、训练计划和营养方案都得到妥善分析和整理。
 
-Before leaving, he left a note with his week training program. I then took the responsability to come up with a **menu** for tomorrow's meals.
+在离开前，他留下了本周训练计划的笔记。我随后负责拟定了明日餐点的**菜单**。
 
-For future such event, let's create a document analysis system using LangGraph to serve Mister Wayne's needs. This system can:
+为应对未来的类似需求，让我们使用 LangGraph 构建一个文档分析系统来服务 Mr Wayne。该系统能够：
 
-1. Process images document
-2. Extract text using vision models (Vision Language Model)
-3. Perform calculations when needed (to demonstrate normal tools)
-4. Analyze content and provide concise summaries
-5. Execute specific instructions related to documents
+1. 处理图像文档
+2. 使用视觉模型 (Vision Language Model) 提取文本
+3. 在需要时执行计算（用于演示常规工具）
+4. 分析内容并提供简明摘要
+5. 执行与文档相关的特定指令
 
-## The Butler's Workflow
+## 管家的工作流程
 
-The workflow we'll build, follows a structured this schema:
+我们将构建的工作流程遵循以下结构化方案：
 
 ![Butler's Document Analysis Workflow](https://huggingface.co/datasets/agents-course/course-images/resolve/main/en/unit2/LangGraph/alfred_flow.png)
 
 <Tip>
-You can follow the code in <a href="https://huggingface.co/agents-course/notebooks/blob/main/unit2/langgraph/agent.ipynb" target="_blank">this notebook</a> that you can run using Google Colab.
+您可以在 <a href="https://huggingface.co/agents-course/notebooks/blob/main/unit2/langgraph/agent.ipynb" target="_blank">这个 notebook</a> 中查看代码，并通过 Google Colab 运行。
 </Tip>
-
-## Setting Up the environment
+## 设置环境
 
 ```python
 %pip install langgraph langchain_openai Pillow base64 langchain_core
@@ -41,21 +40,21 @@ from langgraph.prebuilt import ToolNode
 from IPython.display import Image, display
 ```
 
-## Defining Agent's State
+## 定义智能体的状态
 
-This state is a little more complex than the previous ones we have seen.
-AnyMessage is a class from langchain that define messages and the add_messages is an operator that add the latest message rather than overwritting it with the latest state.
+这个状态比我们之前见过的稍微复杂些。
+AnyMessage 是来自 langchain 的类，用于定义消息，而 add_messages 是一个操作符，它会添加最新消息而不是覆盖现有状态。
 
-This is a new concept in LangGraph, where you can add operators in your state to define the way they should interact together.
+这是 langGraph 中的一个新概念，您可以在状态中添加 operators 来定义它们之间的交互方式。
 
 ```python
 class AgentState(TypedDict):
-    # The document provided
+    # 提供的文件
     input_file: Optional[str]  # Contains file path (PDF/PNG)
     messages: Annotated[list[AnyMessage], add_messages]
 ```
 
-## Preparing Tools
+## 准备工具
 
 ```python
 vision_llm = ChatOpenAI(model="gpt-4o")
@@ -69,13 +68,13 @@ def extract_text(img_path: str) -> str:
     """
     all_text = ""
     try:
-        # Read image and encode as base64
+        # 读取图像并编码为 base64
         with open(img_path, "rb") as image_file:
             image_bytes = image_file.read()
 
         image_base64 = base64.b64encode(image_bytes).decode("utf-8")
 
-        # Prepare the prompt including the base64 image data
+        # 准备包含 base64 图像数据的提示
         message = [
             HumanMessage(
                 content=[
@@ -96,15 +95,15 @@ def extract_text(img_path: str) -> str:
             )
         ]
 
-        # Call the vision-capable model
+        # 调用具有视觉功能的模型
         response = vision_llm.invoke(message)
 
-        # Append extracted text
+        # 附加提取的文本
         all_text += response.content + "\n\n"
 
         return all_text.strip()
     except Exception as e:
-        # A butler should handle errors gracefully
+        # 管家应优雅地处理错误
         error_msg = f"Error extracting text: {str(e)}"
         print(error_msg)
         return ""
@@ -113,7 +112,7 @@ def divide(a: int, b: int) -> float:
     """Divide a and b - for Master Wayne's occasional calculations."""
     return a / b
 
-# Equip the butler with tools
+# 为管家配备工具
 tools = [
     divide,
     extract_text
@@ -123,11 +122,11 @@ llm = ChatOpenAI(model="gpt-4o")
 llm_with_tools = llm.bind_tools(tools, parallel_tool_calls=False)
 ```
 
-## The nodes
+## 节点
 
 ```python
 def assistant(state: AgentState):
-    # System message
+    # 系统消息
     textual_description_of_tool="""
 extract_text(img_path: str) -> str:
     Extract text from an image file using a multimodal model.
@@ -149,54 +148,54 @@ divide(a: int, b: int) -> float:
     }
 ```
 
-## The ReAct Pattern: How I Assist Mr. Wayne
+## ReAct 模式：我如何协助 Wayne 先生
 
-Allow me to explain the approach in this agent. The agent follows what's known as the ReAct pattern (Reason-Act-Observe)
+请允许我解释该智能体的工作方式。该智能体遵循被称为 ReAct 的模式（推理-行动-观察）
 
-1. **Reason** about his documents and requests
-2. **Act** by using appropriate tools 
-3. **Observe** the results
-4. **Repeat** as necessary until I've fully addressed his needs
+1. **推理** 分析文档和请求内容
+2. **行动** 通过调用合适的工具执行操作
+3. **观察** 工具执行结果
+4. **重复** 上述步骤直到完全满足需求
 
-This is a simple implementation of an agent using langGraph.
+这是使用 langGraph 实现的简单智能体实现。
 
 ```python
 ## The graph
 builder = StateGraph(AgentState)
 
-# Define nodes: these do the work
+# 定义节点：这些节点完成工作
 builder.add_node("assistant", assistant)
 builder.add_node("tools", ToolNode(tools))
 
-# Define edges: these determine how the control flow moves
+# 定义边：这些决定了控制流如何移动
 builder.add_edge(START, "assistant")
 builder.add_conditional_edges(
     "assistant",
-    # If the latest message requires a tool, route to tools
-    # Otherwise, provide a direct response
+    # 如果最新消息需要工具，则路由至工具
+    # 否则，请直接回复
     tools_condition,
 )
 builder.add_edge("tools", "assistant")
 react_graph = builder.compile()
 
-# Show the butler's thought process
+# 展现管家的思考过程
 display(Image(react_graph.get_graph(xray=True).draw_mermaid_png()))
 ```
 
 ![ReAct Pattern](https://huggingface.co/datasets/agents-course/course-images/resolve/main/en/unit2/LangGraph/Agent.png)
 
-## The Butler in Action
+## 管家实战示例
 
-### Example 1: Simple Calculations
+### 示例1：简单计算
 
-In the following example, we added this divide example just as a 
+在以下示例中，我们添加这个 divide 示例仅作为演示用途。
 
 ```python
 messages = [HumanMessage(content="Divide 6790 by 5")]
 messages = react_graph.invoke({"messages": messages, "input_file": None})
 ```
 
-The conversation would proceed:
+对话将会继续：
 
 ```
 Human: Divide 6790 by 5
@@ -208,44 +207,44 @@ Tool Response: 1358.0
 Alfred: The result of dividing 6790 by 5 is 1358.0.
 ```
 
-### Example 2: Analyzing Master Wayne's Training Documents
+### 示例 2：分析 Wayne 大师的训练文档
 
-When Master Wayne leaves his training and meal notes:
+当 Wayne 大师留下他的训练和​​用餐笔记时：
 
 ```python
 messages = [HumanMessage(content="According to the note provided by Mr. Wayne in the provided images. What's the list of items I should buy for the dinner menu?")]
 messages = react_graph.invoke({"messages": messages, "input_file": "Batman_training_and_meals.png"})
 ```
 
-The interaction would proceed:
+交互将进行：
 
 ```
-Human: According to the note provided by Mr. Wayne in the provided images. What's the list of items I should buy for the dinner menu?
+用户：根据 Wayne 先生在提供的图像中的注释。我应该为晚餐菜单购买哪些物品？
 
 AI Tool Call: extract_text(img_path="Batman_training_and_meals.png")
 
-Tool Response: [Extracted text with training schedule and menu details]
+Tool Response: [包含训练计划和菜单详情的提取文本]
 
-Alfred: For the dinner menu, you should buy the following items:
+Alfred：根据晚餐菜单，您应该购买以下物品：
 
-1. Grass-fed local sirloin steak
-2. Organic spinach
-3. Piquillo peppers
-4. Potatoes (for oven-baked golden herb potato)
-5. Fish oil (2 grams)
+1. 草饲本地西冷牛排（Grass-fed local sirloin steak）
+2. 有机菠菜（Organic spinach）
+3. 皮克略辣椒（Piquillo peppers） 
+4. 土豆（用于烤制金黄香草土豆）
+5. 鱼油（2 克）
 
-Ensure the steak is grass-fed and the spinach and peppers are organic for the best quality meal.
+确保牛排是草饲的，并且菠菜和辣椒是有机的，以获得最佳品质的餐点。
 ```
 
-## Key Takeaways
+## 关键要点
 
-Should you wish to create your own document analysis butler, here are key considerations:
+若您希望创建自己的文档分析管家，请遵循以下关键原则：
 
-1. **Define clear tools** for specific document-related tasks
-2. **Create a robust state tracker** to maintain context between tool calls
-3. **Consider error handling** for tools fails
-5. **Maintain contextual awareness** of previous interactions (ensured by the operator add_messages)
+1. **定义清晰的工具**（Define clear tools）用于特定文档相关任务
+2. **创建强大的状态跟踪器**（Create a robust state tracker）以保持工具调用之间的上下文
+3. **考虑错误处理机制**（Consider error handling）应对工具调用失败
+5. **保持上下文感知能力**（Maintain contextual awareness）通过 add_messages 操作符确保历史交互的连贯性
 
-With these principles, you too can provide exemplary document analysis service worthy of Wayne Manor.
+遵循这些原则，您也能提供符合韦恩庄园标准的卓越文档分析服务。
 
-*I trust this explanation has been satisfactory. Now, if you'll excuse me, Master Wayne's cape requires pressing before tonight's activities.*
+*相信以上解释已足够详尽。恕我失陪，韦恩老爷的披风还需在夜巡前熨烫妥当。*
