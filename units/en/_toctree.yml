@@ -112,8 +112,6 @@
   sections:
   - local: unit3/agentic-rag/introduction
     title: Introduction to Use Case for Agentic RAG
-  - local: unit3/agentic-rag/gala
-    title: A Gala to Remember
   - local: unit3/agentic-rag/agentic-rag
     title: Agentic Retrieval Augmented Generation (RAG)
   - local: unit3/agentic-rag/invitees
