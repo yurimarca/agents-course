@@ -49,7 +49,7 @@ import os
 import base64
 
 # Get your own keys from https://cloud.langfuse.com
-LANGFUSE_PUBLIC_KEY = = "pk-lf-..." 
+LANGFUSE_PUBLIC_KEY = "pk-lf-..." 
 LANGFUSE_SECRET_KEY = "sk-lf-..." 
 os.environ["LANGFUSE_PUBLIC_KEY"] = LANGFUSE_PUBLIC_KEY
 os.environ["LANGFUSE_SECRET_KEY"] = LANGFUSE_SECRET_KEY
@@ -63,7 +63,7 @@ LANGFUSE_AUTH = base64.b64encode(
 os.environ["OTEL_EXPORTER_OTLP_ENDPOINT"] = os.environ.get("LANGFUSE_HOST") + "/api/public/otel"
 os.environ["OTEL_EXPORTER_OTLP_HEADERS"] = f"Authorization=Basic {LANGFUSE_AUTH}"
 ```
-We also need to configure or Hugging Face token for inference calls.
+We also need to configure our Hugging Face token for inference calls.
 
 ```python
 # Set your Hugging Face and other tokens/secrets as environment variable
@@ -109,7 +109,7 @@ agent = CodeAgent(
 agent.run("1+1=")
 ```
 
-Check your [Langfuse Traces Dashboard](https://cloud.langfuse.com/traces) (or your chosen observability tool) to confirm that the spans and logs have been recorded.
+Check your [Langfuse Traces Dashboard](https://cloud.langfuse.com) (or your chosen observability tool) to confirm that the spans and logs have been recorded.
 
 Example screenshot from Langfuse:
 
