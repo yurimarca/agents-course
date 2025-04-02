@@ -1,7 +1,7 @@
 # Creating a RAG Tool for Guest Stories
 
 
-Alfred, your trusted agent, is preparing for the most extravagant gala of the century. To ensure the event runs smoothly, Alfred needs quick access to up-to-date information about each guest. Let's help Alfred by creating a custom Retrieval-Augmented Generation (RAG) tool, powered by our a custom dataset.
+Alfred, your trusted agent, is preparing for the most extravagant gala of the century. To ensure the event runs smoothly, Alfred needs quick access to up-to-date information about each guest. Let's help Alfred by creating a custom Retrieval-Augmented Generation (RAG) tool, powered by our custom dataset.
 
 ## Why RAG for a Gala?
 
@@ -210,7 +210,7 @@ class GuestInfoRetrieverTool(Tool):
 guest_info_tool = GuestInfoRetrieverTool(docs)
 ```
 
-Let's understand this tool step-by-step. 
+Let's understand this tool step-by-step: 
 - The `name` and `description` help the agent understand when and how to use this tool
 - The `inputs` define what parameters the tool expects (in this case, a search query)
 - We're using a `BM25Retriever`, which is a powerful text retrieval algorithm that doesn't require embeddings
@@ -459,7 +459,7 @@ Now that Alfred can retrieve guest information, consider how you might enhance t
 Now Alfred is fully equipped to handle guest inquiries effortlessly, ensuring your gala is remembered as the most sophisticated and delightful event of the century!
 
 <Tip>
-Try extending the retriver tool to also return conversation starters based on each guest's interests or background. How would you modify the tool to accomplish this?
+Try extending the retriever tool to also return conversation starters based on each guest's interests or background. How would you modify the tool to accomplish this?
 
 When you're done, implement your guest retriever tool in the <code>retriever.py</code> file.
 </Tip>
