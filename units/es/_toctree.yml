@@ -108,21 +108,21 @@
     title: Prueba rápida 1
   - local: unit2/langgraph/conclusion
     title: Conclusión
-- title: Unit 3. Use Case for Agentic RAG
+- title: Unidad 3. Caso de Uso para Agentic RAG
   sections:
   - local: unit3/agentic-rag/introduction
     title: Introducción al Caso de Uso para Agentic RAG
   - local: unit3/agentic-rag/agentic-rag
     title: Agentic Retrieval Augmented Generation (RAG)
   - local: unit3/agentic-rag/invitees
-    title: Creating a RAG Tool for Guest Stories
+    title: Creando una herramienta RAG para historias de invitados
   - local: unit3/agentic-rag/tools
-    title: Building and Integrating Tools for Your Agent
+    title: Construyendo y integrando herramientas para tu agente
   - local: unit3/agentic-rag/agent
-    title: Creating Your Gala Agent
+    title: Creando tu agente de gala
   - local: unit3/agentic-rag/conclusion
-    title: Conclusion
-- title: Bonus Unit 1. Fine-tuning an LLM for Function-calling
+    title: Conclusión
+- title: Unidad Bonus 1. Fine-tuning de un LLM para Llamadas a Funciones
   sections:
   - local: bonus-unit1/introduction
     title: Introducción
@@ -132,7 +132,7 @@
     title: Hagamos Fine-Tuning de Tu Modelo para Llamadas a Funciones
   - local: bonus-unit1/conclusion
     title: Conclusión
-- title: Bonus Unit 2. Agent Observability and Evaluation
+- title: Unidad Bonus 2. Observabilidad y Evaluación de Agentes
   sections:
   - local: bonus-unit2/introduction
     title: Introducción
