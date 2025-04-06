@@ -91,18 +91,15 @@ from langgraph.graph import START, StateGraph
 from langgraph.prebuilt import tools_condition
 from langchain_huggingface import HuggingFaceEndpoint, ChatHuggingFace
 
-from tools import DuckDuckGoSearchTool, weather_info_tool, hub_stats_tool
-from retriever import load_guest_dataset
+from tools import DuckDuckGoSearchRun, weather_info_tool, hub_stats_tool
+from retriever import guest_info_tool
 ```
 
 Now, let’s combine all these tools into a single agent:
 
 ```python
 # Initialize the web search tool
-search_tool = DuckDuckGoSearchTool()
-
-# Load the guest dataset and initialize the guest info tool
-guest_info_tool = load_guest_dataset()
+search_tool = DuckDuckGoSearchRun()
 
 # Generate the chat interface, including the tools
 llm = HuggingFaceEndpoint(
@@ -288,8 +285,8 @@ Expected output:
 
 ```
 🎩 Alfred's Response:
-The most popular Qwen model is Qwen/Qwen2.5-VL-7B-Instruct with 3,313,345 downloads.```
-
+The most popular Qwen model is Qwen/Qwen2.5-VL-7B-Instruct with 3,313,345 downloads.
+```
 </hfoption>
 <hfoption id="llama-index">
 
@@ -310,6 +307,7 @@ The most popular model by Google on the Hugging Face Hub is google/electra-base-
 
 </hfoption>
 <hfoption id="langgraph">
+
 ```python
 response = alfred.invoke({"messages": "One of our guests is from Qwen. What can you tell me about their most popular model?"})
 
