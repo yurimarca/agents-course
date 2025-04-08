@@ -430,7 +430,7 @@ response1 = alfred_with_memory.run("Tell me about Lady Ada Lovelace.")
 print("🎩 Alfred's First Response:")
 print(response1)
 
-# Second interaction (referencing the first)
+# Second interaction (referencing the first avoiding a reset)
 response2 = alfred_with_memory.run("What projects is she currently working on?", reset=False)
 print("🎩 Alfred's Second Response:")
 print(response2)
@@ -482,6 +482,11 @@ print(response['messages'][-1].content)
 
 </hfoption>
 </hfoptions>
+
+Notice how three different approaches for agent did not directly coupled the memory with the agents, any reason for that 🧐...
+* smolagents: will not preserve memory across different runs.
+* Llama-index: needs an additional context construct added to the run.
+* LangGraph: can retrieve the previous message or use [MemorySaver](https://langchain-ai.github.io/langgraph/tutorials/introduction/#part-3-adding-memory-to-the-chatbot)
 
 ## Conclusion
 
