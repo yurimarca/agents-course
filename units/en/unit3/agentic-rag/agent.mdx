@@ -483,10 +483,10 @@ print(response['messages'][-1].content)
 </hfoption>
 </hfoptions>
 
-Notice how three different approaches for agent did not directly coupled the memory with the agents, any reason for that 🧐...
-* smolagents: will not preserve memory across different runs.
-* Llama-index: needs an additional context construct added to the run.
-* LangGraph: can retrieve the previous message or use [MemorySaver](https://langchain-ai.github.io/langgraph/tutorials/introduction/#part-3-adding-memory-to-the-chatbot)
+Notice that none of these three agent approaches directly couple memory with the agent. Is there a specific reason for this design choice 🧐?
+* smolagents: Memory is not preserved across different execution runs.
+* LlamaIndex: Requires explicitly adding a context construct for memory management within a run.
+* LangGraph: Offers options to retrieve previous messages or utilize a dedicated [MemorySaver](https://langchain-ai.github.io/langgraph/tutorials/introduction/#part-3-adding-memory-to-the-chatbot) component.
 
 ## Conclusion
 
