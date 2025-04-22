@@ -118,6 +118,16 @@
     title: 让我们为函数调用微调模型
   - local: bonus-unit1/conclusion
     title: 结论
+- title: 附加单元 2. 智能体可观察性和评估
+  sections:
+    - local: bonus_unit2/introduction
+      title: 简介
+    - local: bonus_unit2/what-is-agent-observability-and-evaluation
+      title: 什么是智能体可观察性和评估？
+    - local: bonus_unit2/monitoring-and-evaluating-agents-notebook
+      title: 监控和评估智能体
+    - local: bonus_unit2/quiz
+      title: 测验
 - title: 后续内容何时发布？
   sections:
   - local: communication/next-units
