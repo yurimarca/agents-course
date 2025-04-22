@@ -1,15 +1,50 @@
-## What is Gaia?
+# What is GAIA?
 
-[GAIA (General AI Assistants)](https://huggingface.co/papers/2311.12983) is a **benchmark designed to evaluate AI systems on real-world tasks** that necessitate a combination of fundamental abilities, including reasoning, multi-modal understanding, web browsing, and proficient tool use. 
+[GAIA](https://huggingface.co/papers/2311.12983) is a **benchmark designed to evaluate AI assistants on real-world tasks** that require a blend of essential capabilities—such as reasoning, multi-modal understanding, web browsing, and effective tool use.
 
-The benchmark comprises 466 questions that are conceptually straightforward for humans but present **significant challenges for current AI models**. For instance, human respondents achieve a 92% success rate on these tasks, whereas GPT-4 equipped with plugins attains only 15%. 
+It was introduced in the paper _"GAIA: A Benchmark for General AI Assistants"_.
 
-The GAIA benchmark is structured into **three difficulty levels**, each designed to test specific competencies of AI assistants:
+The benchmark includes **466 questions** that are conceptually simple for humans but remain **highly challenging for current AI models**. To give you a sense of difficulty: humans achieve a **92% success rate**, while GPT-4 with plugins scores just **15%**.
 
-- *Level 1* questions typically require around five steps and minimal tool use.
-- *Level 2* involves more complex reasoning and multiple tools
-- *Level 3* demands extensive multi-step planning and sophisticated tool integration.
+## Difficulty Levels
 
-To facilitate ongoing evaluation and improvement, **GAIA provides a public leaderboard hosted on Hugging Face**, where 300 of the questions are available for testing AI models. You can find the leaderboard[here](https://huggingface.co/spaces/gaia-benchmark/leaderboard)
+GAIA tasks are organized into **three levels of increasing complexity**, each testing specific skills:
 
-If you want to learn more about GAIA, you can read the paper 👉[here](https://huggingface.co/papers/2311.12983)
+- **Level 1**: Requires  aorund 5 steps and minimal tool usage.
+- **Level 2**: Involves more complex reasoning and coordination between multiple tools.
+- **Level 3**: Demands long-term planning and advanced integration of various tools.
+
+## Example of a Hard GAIA Question
+
+> Which of the fruits shown in the 2008 painting "Embroidery from Uzbekistan" were served as part of the October 1949 breakfast menu for the ocean liner that was later used as a floating prop for the film "The Last Voyage"? Give the items as a comma-separated list, ordering them in clockwise order based on their arrangement in the painting starting from the 12 o'clock position. Use the plural form of each fruit.
+
+As you can see, this question challenges AI systems in several ways:
+
+- Requires a **structured response format**
+- Involves **multimodal reasoning** (e.g., analyzing images)
+- Demands **multi-hop retrieval** of interdependent facts:
+  - Identifying the fruits in the painting
+  - Discovering which ocean liner was used in *The Last Voyage*
+  - Looking up the breakfast menu from October 1949 for that ship
+- Needs **correct sequencing** and high-level planning to solve in the right order
+
+This kind of task highlights where standalone LLMs often fall short—making GAIA an ideal benchmark for **agent-based systems** that can reason, retrieve, and execute over multiple steps and modalities.
+
+## Live Evaluation
+
+To encourage continuous benchmarking, **GAIA provides a public leaderboard hosted on Hugging Face**, where you can test your models against **300 testing questions**.
+
+👉 Check out the leaderboard [here](https://huggingface.co/spaces/gaia-benchmark/leaderboard)
+
+<iframe
+	src="https://gaia-benchmark-leaderboard.hf.space"
+	frameborder="0"
+	width="850"
+	height="450"
+></iframe>
+
+Want to dive deeper into GAIA?
+
+📄 [Read the full paper](https://huggingface.co/papers/2311.12983)
+📄 [Deep Research release post by OpenAI](https://openai.com/index/introducing-deep-research/)
+📄 [Open-source DeepResearch – Freeing our search agents](https://huggingface.co/blog/open-deep-research)
