@@ -149,7 +149,7 @@
   - local: bonus-unit3/state-of-art
     title: The State of the Art in Using LLMs in Games
   - local: bonus-unit3/from-llm-to-agents
-    title: From LLMs to LLM Agents
+    title: From LLMs to AI Agents
 - title: When the next steps are published?
   sections:
   - local: communication/next-units
