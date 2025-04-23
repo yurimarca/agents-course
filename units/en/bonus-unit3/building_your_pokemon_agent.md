@@ -38,15 +38,43 @@ We’ve deployed a server that all participants will use to battle. Let’s see 
 
 ## 🔌 LLMAgentBase
 
-LLMAgentBase is a Python class that inherits from the `Player` class from Poke-env. We’ve tailored it to serve as the bridge between your LLM and the Poke-env simulator.
+`LLMAgentBase` is a Python class that extends the `Player` class from **Poke-env**.  
+It serves as the bridge between your **LLM** and the **Pokémon battle simulator**, handling input/output formatting and maintaining battle context.
 
-It takes care of formatting inputs, parsing outputs, and managing the agent’s memory.  
-The key method is `choose_move`, which takes a `Battle` object and returns an action based on the LLM's decision.
+This base agent provides a set of tools (defined in `STANDARD_TOOL_SCHEMA`) to interact with the environment, including:
+
+- `choose_move`: for selecting an attack during battle  
+- `choose_switch`: for switching Pokémon  
+
+The LLM should use these tools to make decisions during a match.
+
+### 🧠 Core Logic
+
+- `choose_move(battle: Battle)`: This is the main method invoked each turn. It takes a `Battle` object and returns an action string based on the LLM’s output.
+
+### 🔧 Key Internal Methods
+
+- `_format_battle_state(battle)`: Converts the current battle state into a string, making it suitable for sending to the LLM.
+
+- `_find_move_by_name(battle, move_name)`: Finds a move by name, used in LLM responses that call `choose_move`.
+
+- `_find_pokemon_by_name(battle, pokemon_name)`: Locates a specific Pokémon to switch into, based on the LLM’s switch command.
+
+- `_get_llm_decision(battle_state)`: This method is abstract in the base class. You’ll need to implement it in your own agent (see next section), where you define how to query the LLM and parse its response.
 
 Here’s an excerpt showing how that decision-making works:
 
 
 ```python
+STANDARD_TOOL_SCHEMA = {
+    "choose_move": {
+        ...
+    },
+    "choose_switch": {
+        ...
+    },
+}
+
 class LLMAgentBase(Player):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -131,6 +159,7 @@ class TemplateAgent(LLMAgentBase):
         self.template_tools = list(self.standard_tools.values())
 
     async def _get_llm_decision(self, battle_state: str) -> Dict[str, Any]:
+        """Sends state to the LLM and gets back the function call decision."""
         system_prompt = (
             "You are a ..."
         )
