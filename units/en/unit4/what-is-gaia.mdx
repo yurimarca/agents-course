@@ -1,18 +1,29 @@
 # What is GAIA?
 
-[GAIA](https://huggingface.co/papers/2311.12983) is a **benchmark designed to evaluate AI assistants on real-world tasks** that require a blend of essential capabilities—such as reasoning, multi-modal understanding, web browsing, and effective tool use.
+[GAIA](https://huggingface.co/papers/2311.12983) is a **benchmark designed to evaluate AI assistants on real-world tasks** that require a blend of essential capabilities, such as reasoning, multi-modal understanding, web browsing, and effective tool use.
 
 It was introduced in the paper _"GAIA: A Benchmark for General AI Assistants"_.
 
 The benchmark includes **466 questions** that are conceptually simple for humans but remain **highly challenging for current AI models**. To give you a sense of difficulty: humans achieve a **92% success rate**, while GPT-4 with plugins scores just **15%**.
 
+## 🌱 GAIA’s Core Principles
+
+GAIA is carefully designed around the following pillars:
+
+- 🔍 **Real-world difficulty**: Tasks require multi-step reasoning, multimodal understanding, and tool interaction.
+- 🧾 **Human interpretability**: Despite their difficulty for AI, tasks remain conceptually simple and easy to follow for humans.
+- 🛡️ **Non-gameability**: Correct answers demand full task execution, making brute-forcing ineffective.
+- 🧰 **Simplicity of evaluation**: Answers are concise, factual, and unambiguous—ideal for benchmarking.
+
 ## Difficulty Levels
 
 GAIA tasks are organized into **three levels of increasing complexity**, each testing specific skills:
 
-- **Level 1**: Requires around 5 steps and minimal tool usage.
-- **Level 2**: Involves more complex reasoning and coordination between multiple tools.
+- **Level 1**: Requires less than 5 steps and minimal tool usage.
+- **Level 2**: Involves more complex reasoning and coordination between multiple tools and 5-10 steps.
 - **Level 3**: Demands long-term planning and advanced integration of various tools.
+
+![GAIA levels](https://huggingface.co/datasets/agents-course/course-images/resolve/main/en/unit4/gaia_levels.png)
 
 ## Example of a Hard GAIA Question
 
@@ -29,6 +40,8 @@ As you can see, this question challenges AI systems in several ways:
 - Needs **correct sequencing** and high-level planning to solve in the right order
 
 This kind of task highlights where standalone LLMs often fall short, making GAIA an ideal benchmark for **agent-based systems** that can reason, retrieve, and execute over multiple steps and modalities.
+
+![GAIA capabilities plot](https://huggingface.co/datasets/agents-course/course-images/resolve/main/en/unit4/gaia_capabilities.png)
 
 ## Live Evaluation
 
