@@ -155,7 +155,7 @@
   - local: bonus-unit3/launching_agent_battle
     title: Agentic Pokémon
   - local: bonus-unit3/conclusion
-    title: Agentic Pokémon
+    title: Conclusion
 - title: When the next steps are published?
   sections:
   - local: communication/next-units
