@@ -1,0 +1,160 @@
+# Build Your Own Pokémon Battle Agent
+
+Now that you’ve explored the potential and limitations of Agentic AI in games, it’s time to get hands-on. In this section, you’ll **build your very own AI Agent to battle in Pokémon-style turn-based combat**, using everything you’ve learned throughout the course.
+
+We’ll break the system into four key building blocks:
+
+- **Poke-env:** A Python library designed to train rule-based or reinforcement learning Pokémon bots.
+
+- **Pokémon Showdown:** An online battle simulator where your agent will fight.
+
+- **LLMAgentBase:** A custom Python class we’ve built to connect your LLM with the Poke-env battle environment.
+
+- **TemplateAgent:** A starter template you’ll complete to create your own unique battle agent.
+
+Let’s explore each of these components in more detail.
+
+## 🧠 Poke-env
+
+![Battle gif](https://github.com/hsahovic/poke-env/raw/master/rl-gif.gif)
+
+[Poke-env](https://github.com/hsahovic/poke-env) is a Python interface originally built for training reinforcement learning bots, but we’ve repurposed it for Agentic AI.  
+It allows your agent to interact with Pokémon Showdown through a simple API.
+
+It provides a `Player` class from which your Agent will inherit, covering everything needed to communicate with the graphical interface.
+
+**Documentation**: [poke-env.readthedocs.io](https://poke-env.readthedocs.io/en/stable/)  
+**Repository**: [github.com/hsahovic/poke-env](https://github.com/hsahovic/poke-env)
+
+## ⚔️ Pokémon Showdown
+
+[Pokémon Showdown](https://pokemonshowdown.com/) is an [open-source](https://github.com/smogon/Pokemon-Showdown) battle simulator where your agent will play live Pokémon battles.  
+It provides a full interface to simulate and display battles in real time. In our challenge, your bot will act just like a human player, choosing moves turn by turn.
+
+We’ve deployed a server that all participants will use to battle. Let’s see who builds the best AI battle Agent!
+
+**Repository**: [github.com/smogon/Pokemon-Showdown](https://github.com/smogon/Pokemon-Showdown)  
+**Website**: [pokemonshowdown.com](https://pokemonshowdown.com/)
+
+## 🔌 LLMAgentBase
+
+LLMAgentBase is a Python class that inherits from the `Player` class from Poke-env. We’ve tailored it to serve as the bridge between your LLM and the Poke-env simulator.
+
+It takes care of formatting inputs, parsing outputs, and managing the agent’s memory.  
+The key method is `choose_move`, which takes a `Battle` object and returns an action based on the LLM's decision.
+
+Here’s an excerpt showing how that decision-making works:
+
+
+```python
+class LLMAgentBase(Player):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.standard_tools = STANDARD_TOOL_SCHEMA
+        self.battle_history = []
+
+    async def choose_move(self, battle: Battle) -> str:
+        battle_state_str = self._format_battle_state(battle)
+        decision_result = await self._get_llm_decision(battle_state_str)
+        decision = decision_result.get("decision")
+        error_message = decision_result.get("error")
+        action_taken = False
+        fallback_reason = ""
+
+        if decision:
+            function_name = decision.get("name")
+            args = decision.get("arguments", {})
+            if function_name == "choose_move":
+                move_name = args.get("move_name")
+                if move_name:
+                    chosen_move = self._find_move_by_name(battle, move_name)
+                    if chosen_move and chosen_move in battle.available_moves:
+                        action_taken = True
+                        chat_msg = f"AI Decision: Using move '{chosen_move.id}'."
+                        print(chat_msg)
+                        return self.create_order(chosen_move)
+                    else:
+                        fallback_reason = f"LLM chose unavailable/invalid move '{move_name}'."
+                else:
+                     fallback_reason = "LLM 'choose_move' called without 'move_name'."
+            elif function_name == "choose_switch":
+                pokemon_name = args.get("pokemon_name")
+                if pokemon_name:
+                    chosen_switch = self._find_pokemon_by_name(battle, pokemon_name)
+                    if chosen_switch and chosen_switch in battle.available_switches:
+                        action_taken = True
+                        chat_msg = f"AI Decision: Switching to '{chosen_switch.species}'."
+                        print(chat_msg)
+                        return self.create_order(chosen_switch)
+                    else:
+                        fallback_reason = f"LLM chose unavailable/invalid switch '{pokemon_name}'."
+                else:
+                    fallback_reason = "LLM 'choose_switch' called without 'pokemon_name'."
+            else:
+                fallback_reason = f"LLM called unknown function '{function_name}'."
+
+        if not action_taken:
+            if not fallback_reason:
+                 if error_message:
+                     fallback_reason = f"API Error: {error_message}"
+                 elif decision is None:
+                      fallback_reason = "LLM did not provide a valid function call."
+                 else:
+                      fallback_reason = "Unknown error processing LLM decision."
+
+            print(f"Warning: {fallback_reason} Choosing random action.")
+
+            if battle.available_moves or battle.available_switches:
+                 return self.choose_random_move(battle)
+            else:
+                 print("AI Fallback: No moves or switches available. Using Struggle/Default.")
+                 return self.choose_default_move(battle)
+```
+
+**Full source code**: [agents.py](https://huggingface.co/spaces/Jofthomas/twitch_streaming/blob/main/agents.py)
+
+## 🧪 TemplateAgent
+
+Now comes the fun part! With LLMAgentBase as your foundation, it’s time to implement your own agent, with your own strategy to climb the leaderboard.
+
+You’ll start from this template and build your own logic. We’ve also provided three [complete examples](https://huggingface.co/spaces/Jofthomas/twitch_streaming/blob/main/agents.py) using **OpenAI**, **Mistral**, and **Gemini** models to guide you.
+
+Here’s a simplified version of the template:
+
+```python
+class TemplateAgent(LLMAgentBase):
+    """Uses Template AI API for decisions."""
+    def __init__(self, api_key: str = None, model: str = "model-name", *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.model = model
+        self.template_client = TemplateModelProvider(api_key=...)
+        self.template_tools = list(self.standard_tools.values())
+
+    async def _get_llm_decision(self, battle_state: str) -> Dict[str, Any]:
+        system_prompt = (
+            "You are a ..."
+        )
+        user_prompt = f"..."
+
+        try:
+            response = await self.template_client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ],
+            )
+            message = response.choices[0].message
+            
+            return {"decision": {"name": function_name, "arguments": arguments}}
+
+        except Exception as e:
+            print(f"Unexpected error during call: {e}")
+            return {"error": f"Unexpected error: {e}"}
+```
+
+This code won’t run out of the box, it’s a blueprint for your custom logic.
+
+With all the pieces ready, it’s your turn to build a competitive agent. In the next section, we’ll show how to deploy your agent to our server and battle others in real-time.
+
+Let the battle begin! 🔥

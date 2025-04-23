@@ -150,6 +150,8 @@
     title: The State of the Art in Using LLMs in Games
   - local: bonus-unit3/from-llm-to-agents
     title: From LLMs to AI Agents
+  - local: bonus-unit3/building_your_pokemon_agent
+    title: Build Your Own Pokémon Battle Agent
 - title: When the next steps are published?
   sections:
   - local: communication/next-units
