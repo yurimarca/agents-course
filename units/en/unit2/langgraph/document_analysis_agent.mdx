@@ -14,7 +14,7 @@ For future such events, let's create a document analysis system using LangGraph 
 
 ## The Butler's Workflow
 
-The workflow we'll build, follows a structured this schema:
+The workflow we’ll build follows this structured schema:
 
 ![Butler's Document Analysis Workflow](https://huggingface.co/datasets/agents-course/course-images/resolve/main/en/unit2/LangGraph/alfred_flow.png)
 
@@ -139,7 +139,7 @@ divide(a: int, b: int) -> float:
     Divide a and b
 """
     image=state["input_file"]
-    sys_msg = SystemMessage(content=f"You are an helpful butler named Alfred that serves Mr. Wayne and Batman. You can analyse documents and run computations with provided tools:\n{textual_description_of_tool} \n You have access to some optional images. Currently the loaded image is: {image}")
+    sys_msg = SystemMessage(content=f"You are a helpful butler named Alfred that serves Mr. Wayne and Batman. You can analyse documents and run computations with provided tools:\n{textual_description_of_tool} \n You have access to some optional images. Currently the loaded image is: {image}")
 
     return {
         "messages": [llm_with_tools.invoke([sys_msg] + state["messages"])],
