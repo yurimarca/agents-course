@@ -23,9 +23,11 @@ Here is a summary of the routes (see the [live documentation](https://agents-cou
 * **`GET /files/{task_id}`**: Download a specific file associated with a given task ID.
 * **`POST /submit`**: Submit agent answers, calculate the score, and update the leaderboard.
 
+The submit function will compare the answer to the ground truth in an **EXACT MATCH** manner, hence prompt it well ! The GAIA team shared a prompting example for your agent [here](https://huggingface.co/spaces/gaia-benchmark/leaderboard)
+
 🎨 **Make the Template Your Own!**
 
-To demonstrate the process of interracting with the API, we've included a [basic template](https://huggingface.co/spaces/agents-course/Final_Assignment_Template) as a starting point.
+To demonstrate the process of interacting with the API, we've included a [basic template](https://huggingface.co/spaces/agents-course/Final_Assignment_Template) as a starting point.
 Please feel free—and **actively encouraged**—to change, add to, or completely restructure it! Modify it in any way that best suits your approach and creativity.
 
 In order to submit this templates compute 3 things needed by the API :
@@ -39,7 +41,7 @@ Hence we encourage you to start by duplicating this [template](https://huggingfa
 🏆 Check out the leaderboard [here](https://huggingface.co/spaces/agents-course/Students_leaderboard)
 
 *A friendly note: This leaderboard is meant for fun! We know it's possible to submit scores without full verification. If we see too many high scores posted without a public link to back them up, we might need to review, adjust, or remove some entries to keep the leaderboard useful.*
-
+The leaderboard will show the link to your space code-base, since this leaderboard is for students only, please keep your space public if you get a score you're proud of.
 <iframe
 	src="https://agents-course-students-leaderboard.hf.space"
 	frameborder="0"
