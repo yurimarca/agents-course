@@ -156,8 +156,4 @@
     title: Launching Your Pokémon Battle Agent
   - local: bonus-unit3/conclusion
     title: Conclusion
-- title: When the next steps are published?
-  sections:
-  - local: communication/next-units
-    title: Next Units
 
