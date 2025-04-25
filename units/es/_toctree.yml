@@ -156,7 +156,17 @@
     title: Monitorear y Evaluar Agentes
   - local: bonus-unit2/quiz
     title: Prueba
-- title: ¿Cuando las siguientes unidades estén publicadas?
+- title: Bonus Unit 3. Agentes en Juegos con Pokémon
   sections:
-  - local: communication/next-units
-    title: Siguientes unidades
+  - local: bonus-unit3/introduction
+    title: Introducción
+  - local: bonus-unit3/state-of-art
+    title: El Estado del Arte en el Uso de LLMs en Juegos
+  - local: bonus-unit3/from-llm-to-agents
+    title: De LLMs a Agentes
+  - local: bonus-unit3/building_your_pokemon_agent
+    title: Construye tu propio Agente Pokémon
+  - local: bonus-unit3/launching_agent_battle
+    title: Lanzar tu Agente Pokémon
+  - local: bonus-unit3/conclusion
+    title: Conclusión
