@@ -2,7 +2,7 @@
 
 We learned in the [first unit](https://huggingface.co/learn/agents-course/unit1/introduction) of the course that AI Agents are able to plan and make decisions. And while LLMs have enabled more natural interactions with NPCs, Agentic AI takes it a step further by allowing characters to make decisions, plan actions, and adapt to changing environments. 
 
-This shift means NPCs can now exhibit goal-directed behaviors, leading to more dynamic and unpredictable gameplay.
+This shift means NPCs can now directly interract with their environment through goal-directed behaviors. Ultimatly leading to more dynamic and unpredictable gameplay.
 
 Agentic AI empowers NPCs with:
 
@@ -10,19 +10,20 @@ Agentic AI empowers NPCs with:
 - **Adaptability**: Adjusting strategies in response to player actions.
 - **Persistence**: Remembering past interactions to inform future behavior.
 
-This shift transforms NPCs from reactive entities (react to your inputs) into proactive participants in the game world.
+This transforms NPCs from reactive entities (react to your inputs) into proactive participants in the game world. Which open up the door for inovative gameplays.
 
-[Need to rewrite this part more content needed to be added]
 
-## The big limitation of Agents: it’s slow (for now)
+## The big limitation of Agents: **it’s slow** (for now)
 
 However, let’s not be too much optimistic for now. Despite its potential, Agentic AI currently faces challenges in real-time applications. 
 
 The reasoning and planning processes can introduce latency, making it less suitable for fast-paced games like *Doom* or *Super Mario Bros.*
 
-For instance, check this difference between a Deep Reinforcement Learning Agent and an LLM Agent in Doom
+Let's take the example of claude plays pokémon for instance, and pay attention to the number of token needed to **think** added to the number of token needed to **act**, we can understand that we would need other decoding strategies if wanted to play in real time.
 
-[Illustration vizdoom difference speed]
+<img src="https://huggingface.co/datasets/agents-course/course-images/resolve/main/en/bonus-unit3/claude-plays-pokemon.png" alt="Claude plays Pokémon"/>
+
+A game should be played around 30 FPS minimum, so, it means that in theory, to be a real time AI  agent, it should be able to **act** 30 times a second which is not feasible.
 
 However, turn-based games like *Pokémon* are ideal candidates, as they allow the AI enough time to deliberate and make strategic decisions.
 
