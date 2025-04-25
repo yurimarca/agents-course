@@ -156,8 +156,4 @@
     title: Monitoring and evaluating agents
   - local: bonus-unit2/quiz
     title: Quiz
-- title: When the next steps are published?
-  sections:
-  - local: communication/next-units
-    title: Next Units
 
