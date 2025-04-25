@@ -63,7 +63,7 @@ To cite this repository in publications:
 
 ```bibtex
 @misc{agents-course,
-  author = {Burtenshaw, Ben and Thomas, Joffrey and Simonini, Thomas},
+  author = {Burtenshaw, Ben and Thomas, Joffrey and Simonini, Thomas and Paniego, Sergio},
   title = {The Hugging Face Agents Course},
   year = {2025},
   howpublished = {\url{https://github.com/huggingface/agents-course}},
