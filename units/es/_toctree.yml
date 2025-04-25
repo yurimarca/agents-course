@@ -132,6 +132,20 @@
     title: Hagamos Fine-Tuning de Tu Modelo para Llamadas a Funciones
   - local: bonus-unit1/conclusion
     title: Conclusión
+- title: Unidad 4. Proyecto Final - Crear, Probar y Certificar tu Agente
+  sections:
+  - local: unit4/introduction
+    title: Introducción a la unidad final
+  - local: unit4/what-is-gaia
+    title: ¿Qué es GAIA?
+  - local: unit4/hands-on
+    title: El último Hands-On
+  - local: unit4/get-your-certificate
+    title: Obtén tu certificado de Excelencia
+  - local: unit4/conclusion
+    title: Conclusión del curso
+  - local: unit4/additional-readings
+    title: ¿Qué más deberías aprender?
 - title: Unidad Bonus 2. Observabilidad y Evaluación de Agentes
   sections:
   - local: bonus-unit2/introduction
