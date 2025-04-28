@@ -6,7 +6,7 @@ If you like the course, **don't hesitate to ⭐ star this repository**. This hel
 
 ## Content
 
-The course is divided into 5 units. These will take you from **the basics of agents to a final assignment with a benchmark**.
+The course is divided into 4 units. These will take you from **the basics of agents to a final assignment with a benchmark**.
 
 Sign up here (it's free) 👉 <a href="https://bit.ly/hf-learn-agents" target="_blank">https://bit.ly/hf-learn-agents</a>
 
@@ -41,21 +41,6 @@ If you find a small typo or grammar mistake, please fix it yourself and submit a
 ### New unit
 
 If you want to add a new unit, **please create an issue in the repository, describe the unit, and why it should be added**. We will discuss it and if it's a good addition, we can collaborate on it.
-
-### Work on existing units
-
-We are actively working on the units and if you want to join us, we will need to find a place in the workflow. Here's an overview of where we are open to collaboration:
-
-| Unit | Status        | Contributions                                                          |
-|------|--------------|------------------------------------------------------------------------|
-| 0    | ✅ Complete    | Bug fixes and improvements only                                        |
-| 1    | ✅ Complete    | Bug fixes and improvements only                         |
-| 2    | 🚧 In Progress | If you're a contributor to a framework, we're open to contributions and reviews |
-| 3    | 🗓️ Planned    | If you're experienced with agents, we're open to help with use cases |
-| 4    | 🚧 In Progress | Work is underway, no need for help with integration                         |
-
-If in doubt, join the discussion in the [Discord](https://discord.gg/UrrTSsSyjb).
-
 
 ## Citing the project
 
