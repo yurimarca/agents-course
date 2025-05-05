@@ -60,7 +60,7 @@ If the code block contains many plain texts, prove translation in collapsible <d
     ```
 
 
-IMPORTANT: Only output the translated text and nothing else, no need explaination or instruction. The input text is between "=== BEGIN OF TEXT ===" and "=== END OF TEXT ===".
+IMPORTANT: Only output the translated text and nothing else, no need explanation or instruction. The input text is between "=== BEGIN OF TEXT ===" and "=== END OF TEXT ===".
 
 Please translate the following text to vietnamese:
 
