@@ -71,7 +71,7 @@ You can download the image by clicking 👉 [here](https://huggingface.co/datase
     ID (PID) that is currently using this port. If the process is `ollama`, it is likely that the installation script above has started ollama
     service, so you can skip this command to start Ollama.
 
-4. **Use `LiteLLMModel` Instead of `HfApiModel`**
+4. **Use `LiteLLMModel` Instead of `InferenceClientModel`**
 
    To use `LiteLLMModel` module in `smolagents`, you may run `pip` command to install the module.
 
@@ -92,7 +92,7 @@ You can download the image by clicking 👉 [here](https://huggingface.co/datase
 5. **Why this works?**
 - Ollama serves models locally using an OpenAI-compatible API at `http://localhost:11434`.
 - `LiteLLMModel` is built to communicate with any model that supports the OpenAI chat/completion API format.
-- This means you can simply swap out `HfApiModel` for `LiteLLMModel` no other code changes required. It’s a seamless, plug-and-play solution.
+- This means you can simply swap out `InferenceClientModel` for `LiteLLMModel` no other code changes required. It’s a seamless, plug-and-play solution.
 
 Congratulations! 🎉 **You've completed the onboarding process**! You're now ready to start learning about AI Agents. Have fun!
 

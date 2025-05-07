@@ -133,9 +133,9 @@ Si no tienes ningún proveedor de Serp API configurado, puedes usar `DuckDuckGoS
 ```python
 import os
 from PIL import Image
-from smolagents import CodeAgent, GoogleSearchTool, HfApiModel, VisitWebpageTool
+from smolagents import CodeAgent, GoogleSearchTool, InferenceClientModel, VisitWebpageTool
 
-model = HfApiModel(model_id="Qwen/Qwen2.5-Coder-32B-Instruct", provider="together")
+model = InferenceClientModel(model_id="Qwen/Qwen2.5-Coder-32B-Instruct", provider="together")
 ```
 
 Podemos empezar creando un agente simple como base para darnos un informe simple.
@@ -234,7 +234,7 @@ Vamos a crear un equipo con un agente de búsqueda web dedicado, gestionado por 
 El agente gestor debe tener capacidades de trazado para escribir su informe final: así que vamos a darle acceso a importaciones adicionales, incluyendo `matplotlib`, y `geopandas` + `shapely` para trazado espacial.
 
 ```python
-model = HfApiModel(
+model = InferenceClientModel(
     "Qwen/Qwen2.5-Coder-32B-Instruct", provider="together", max_tokens=8096
 )
 
@@ -297,7 +297,7 @@ def check_reasoning_and_plot(final_answer, agent_memory):
 
 
 manager_agent = CodeAgent(
-    model=HfApiModel("deepseek-ai/DeepSeek-R1", provider="together", max_tokens=8096),
+    model=InferenceClientModel("deepseek-ai/DeepSeek-R1", provider="together", max_tokens=8096),
     tools=[calculate_cargo_travel_time],
     managed_agents=[web_agent],
     additional_authorized_imports=[

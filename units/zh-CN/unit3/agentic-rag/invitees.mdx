@@ -285,10 +285,10 @@ guest_info_tool = Tool(
 <hfoption id="smolagents">
 
 ```python
-from smolagents import CodeAgent, HfApiModel
+from smolagents import CodeAgent, InferenceClientModel
 
 # 初始化 Hugging Face 模型
-model = HfApiModel()
+model = InferenceClientModel()
 
 # 使用宾客信息工具创建我们的晚会智能体 Alfred
 alfred = CodeAgent(tools=[guest_info_tool], model=model)
@@ -308,7 +308,7 @@ print(response)
 ```
 
 这最后一步具体做了什么：
-- 我们使用 `HfApiModel` 类初始化 Hugging Face 模型
+- 我们使用 `InferenceClientModel` 类初始化 Hugging Face 模型
 - 我们将智能体 (Alfred) 创建为 `CodeAgent`，它可以执行 Python 代码来解决问题
 - 我们让 Alfred 检索一位名叫“Lady Ada Lovelace”的客人的信息
 

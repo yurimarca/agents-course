@@ -47,7 +47,7 @@ Analicemos el código juntos:
 - El archivo comienza con algunas importaciones de bibliotecas simples pero necesarias
 
 ```python
-from smolagents import CodeAgent, DuckDuckGoSearchTool, HfApiModel, load_tool, tool
+from smolagents import CodeAgent, DuckDuckGoSearchTool, InferenceClientModel, load_tool, tool
 import datetime
 import requests
 import pytz
@@ -106,7 +106,7 @@ Utiliza [`Qwen/Qwen2.5-Coder-32B-Instruct`](https://huggingface.co/Qwen/Qwen2.5-
 
 ```python
 final_answer = FinalAnswerTool()
-model = HfApiModel(
+model = InferenceClientModel(
     max_tokens=2096,
     temperature=0.5,
     model_id='Qwen/Qwen2.5-Coder-32B-Instruct',
@@ -132,7 +132,7 @@ agent = CodeAgent(
 GradioUI(agent).launch()
 ```
 
-¡Este Agente todavía usa el `InferenceClient` que vimos en una sección anterior detrás de la clase **HfApiModel**!
+¡Este Agente todavía usa el `InferenceClient` que vimos en una sección anterior detrás de la clase **InferenceClientModel**!
 
 Daremos ejemplos más detallados cuando presentemos el marco en la Unidad 2. Por ahora, debes enfocarte en **agregar nuevas herramientas a la lista de herramientas** usando el parámetro `tools` de tu Agente.
 
@@ -143,7 +143,7 @@ Por ejemplo, podrías usar el `DuckDuckGoSearchTool` que se importó en la prime
 El "app.py" completo: 
 
 ```python
-from smolagents import CodeAgent, DuckDuckGoSearchTool, HfApiModel, load_tool, tool
+from smolagents import CodeAgent, DuckDuckGoSearchTool, InferenceClientModel, load_tool, tool
 import datetime
 import requests
 import pytz
@@ -180,7 +180,7 @@ def get_current_time_in_timezone(timezone: str) -> str:
 
 
 final_answer = FinalAnswerTool()
-model = HfApiModel(
+model = InferenceClientModel(
 max_tokens=2096,
 temperature=0.5,
 model_id='Qwen/Qwen2.5-Coder-32B-Instruct',

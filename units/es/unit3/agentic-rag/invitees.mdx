@@ -297,10 +297,10 @@ Finalmente, juntemos todo creando nuestro agente y equipándolo con nuestra herr
 <hfoption id="smolagents">
 
 ```python
-from smolagents import CodeAgent, HfApiModel
+from smolagents import CodeAgent, InferenceClientModel
 
 # Inicializar el modelo de Hugging Face
-model = HfApiModel()
+model = InferenceClientModel()
 
 # Crear Alfred, nuestro agente de gala, con la herramienta de información de invitados
 alfred = CodeAgent(tools=[guest_info_tool], model=model)
@@ -320,7 +320,7 @@ Basado en la información que recuperé, Lady Ada Lovelace es una estimada matem
 ```
 
 Lo que está sucediendo en este paso final:
-- Inicializamos un modelo de Hugging Face usando la clase `HfApiModel`
+- Inicializamos un modelo de Hugging Face usando la clase `InferenceClientModel`
 - Creamos nuestro agente (Alfred) como un `CodeAgent`, que puede ejecutar código Python para resolver problemas
 - Le pedimos a Alfred que recupere información sobre una invitada llamada "Lady Ada Lovelace"
 

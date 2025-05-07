@@ -20,7 +20,7 @@
 ```python
 #  导入必要的库
 import random
-from smolagents import CodeAgent, HfApiModel
+from smolagents import CodeAgent, InferenceClientModel
 
 # 从自定义模块导入工具
 from tools import DuckDuckGoSearchTool, WeatherInfoTool, HubStatsTool
@@ -31,7 +31,7 @@ from retriever import load_guest_dataset
 
 ```python
 # 初始化 Hugging Face 模型
-model = HfApiModel()
+model = InferenceClientModel()
 
 # 初始化网络搜索工具
 search_tool = DuckDuckGoSearchTool()
