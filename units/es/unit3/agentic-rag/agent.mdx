@@ -20,7 +20,7 @@ Importemos las bibliotecas y herramientas necesarias de las secciones anteriores
 ```python
 # Importar librerías necesarias
 import random
-from smolagents import CodeAgent, HfApiModel
+from smolagents import CodeAgent, InferenceClientModel
 
 # Importar nuestras herramientas personalizadas desde sus módulos
 from tools import DuckDuckGoSearchTool, WeatherInfoTool, HubStatsTool
@@ -31,7 +31,7 @@ Ahora, combinemos todas estas herramientas en un solo agente:
 
 ```python
 # Inicializar el modelo de Hugging Face
-model = HfApiModel()
+model = InferenceClientModel()
 
 # Inicializar la herramienta de búsqueda web
 search_tool = DuckDuckGoSearchTool()

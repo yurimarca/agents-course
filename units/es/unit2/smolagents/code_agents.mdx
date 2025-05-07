@@ -84,14 +84,14 @@ login()
 
 <img src="https://huggingface.co/datasets/agents-course/course-images/resolve/main/en/unit2/smolagents/alfred-playlist.jpg" alt="Lista de reproducción de Alfred"/>
 
-Para el modelo, confiaremos en `HfApiModel`, que proporciona acceso a la [API de Inferencia Serverless](https://huggingface.co/docs/api-inference/index) de Hugging Face. El modelo predeterminado es `"Qwen/Qwen2.5-Coder-32B-Instruct"`, que es eficiente y está disponible para inferencia rápida, pero puedes seleccionar cualquier modelo compatible del Hub.
+Para el modelo, confiaremos en `InferenceClientModel`, que proporciona acceso a la [API de Inferencia Serverless](https://huggingface.co/docs/api-inference/index) de Hugging Face. El modelo predeterminado es `"Qwen/Qwen2.5-Coder-32B-Instruct"`, que es eficiente y está disponible para inferencia rápida, pero puedes seleccionar cualquier modelo compatible del Hub.
 
 Ejecutar un agente es bastante sencillo:
 
 ```python
-from smolagents import CodeAgent, DuckDuckGoSearchTool, HfApiModel
+from smolagents import CodeAgent, DuckDuckGoSearchTool, InferenceClientModel
 
-agent = CodeAgent(tools=[DuckDuckGoSearchTool()], model=HfApiModel())
+agent = CodeAgent(tools=[DuckDuckGoSearchTool()], model=InferenceClientModel())
 
 agent.run("Busca las mejores recomendaciones de música para una fiesta en la mansión de los Wayne.")
 ```
@@ -116,7 +116,7 @@ Ahora que hemos seleccionado una lista de reproducción, necesitamos organizar e
 Como puedes ver en el ejemplo a continuación, crearemos una herramienta usando el decorador `@tool` y la incluiremos en la lista de `tools`.
 
 ```python
-from smolagents import CodeAgent, tool, HfApiModel
+from smolagents import CodeAgent, tool, InferenceClientModel
 
 # Herramienta para sugerir un menú basado en la ocasión
 @tool
@@ -136,7 +136,7 @@ def suggest_menu(occasion: str) -> str:
         return "Menú personalizado para el mayordomo."
 
 # Alfred, el mayordomo, preparando el menú para la fiesta
-agent = CodeAgent(tools=[suggest_menu], model=HfApiModel())
+agent = CodeAgent(tools=[suggest_menu], model=InferenceClientModel())
 
 # Preparando el menú para la fiesta
 agent.run("Prepara un menú formal para la fiesta.")
@@ -159,12 +159,12 @@ Para más detalles sobre la ejecución segura de código, consulta la [guía](ht
 Al crear el agente, usaremos `additional_authorized_imports` para permitir la importación del módulo `datetime`.
 
 ```python
-from smolagents import CodeAgent, HfApiModel
+from smolagents import CodeAgent, InferenceClientModel
 import numpy as np
 import time
 import datetime
 
-agent = CodeAgent(tools=[], model=HfApiModel(), additional_authorized_imports=['datetime'])
+agent = CodeAgent(tools=[], model=InferenceClientModel(), additional_authorized_imports=['datetime'])
 
 agent.run(
     """
@@ -218,7 +218,7 @@ Por ejemplo, el _AlfredAgent_ está disponible [aquí](https://huggingface.co/sp
 Tal vez te preguntes: ¿cómo construyó Alfred un agente así usando `smolagents`? Al integrar varias herramientas, puede generar un agente de la siguiente manera. No te preocupes por las herramientas por ahora, ya que tendremos una sección dedicada más adelante en esta unidad para explorar eso en detalle:
 
 ```python
-from smolagents import CodeAgent, DuckDuckGoSearchTool, FinalAnswerTool, HfApiModel, Tool, tool, VisitWebpageTool
+from smolagents import CodeAgent, DuckDuckGoSearchTool, FinalAnswerTool, InferenceClientModel, Tool, tool, VisitWebpageTool
 
 @tool
 def suggest_menu(occasion: str) -> str:
@@ -290,7 +290,7 @@ agent = CodeAgent(
         catering_service_tool,
         SuperheroPartyThemeTool()
     ], 
-    model=HfApiModel(),
+    model=InferenceClientModel(),
     max_steps=10,
     verbosity_level=2
 )
@@ -355,9 +355,9 @@ SmolagentsInstrumentor().instrument(tracer_provider=trace_provider)
 ¡Alfred ahora está conectado 🔌! Las ejecuciones de `smolagents` se están registrando en Langfuse, dándole visibilidad completa del comportamiento del agente. Con esta configuración, está listo para revisar ejecuciones anteriores y refinar aún más su Agente Preparador de Fiestas.
 
 ```python
-from smolagents import CodeAgent, HfApiModel
+from smolagents import CodeAgent, InferenceClientModel
 
-agent = CodeAgent(tools=[], model=HfApiModel())
+agent = CodeAgent(tools=[], model=InferenceClientModel())
 alfred_agent = agent.from_hub('sergiopaniego/AlfredAgent', trust_remote_code=True)
 alfred_agent.run("Dame la mejor lista de reproducción para una fiesta en la mansión de Wayne. La idea de la fiesta es un tema de 'mascarada de villanos'")  
 ```

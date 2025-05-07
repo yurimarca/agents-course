@@ -304,10 +304,10 @@ Facebook 下载次数最多的模型是 facebook/esmfold_v1，下载次数为 13
 <hfoption id="smolagents">
 
 ```python
-from smolagents import CodeAgent, HfApiModel
+from smolagents import CodeAgent, InferenceClientModel
 
 # 初始化 Hugging Face 模型
-model = HfApiModel()
+model = InferenceClientModel()
 
 # 使用所有工具创建 Alfred
 alfred = CodeAgent(

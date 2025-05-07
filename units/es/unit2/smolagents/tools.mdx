@@ -57,7 +57,7 @@ Imaginemos que Alfred ya ha decidido el menú para la fiesta, pero ahora necesit
 A continuación se muestra un ejemplo de cómo Alfred puede usar el decorador `@tool` para lograrlo:
 
 ```python
-from smolagents import CodeAgent, HfApiModel, tool
+from smolagents import CodeAgent, InferenceClientModel, tool
 
 # Imaginemos que tenemos una función que obtiene los servicios de catering mejor valorados.
 @tool
@@ -81,7 +81,7 @@ def catering_service_tool(query: str) -> str:
     return best_service
 
 
-agent = CodeAgent(tools=[catering_service_tool], model=HfApiModel())
+agent = CodeAgent(tools=[catering_service_tool], model=InferenceClientModel())
 
 # Ejecuta el agente para encontrar el mejor servicio de catering
 result = agent.run(
@@ -110,7 +110,7 @@ La fiesta de Alfred en la mansión es un **evento temático de superhéroes**, p
 Para hacer esto, puede usar un agente que genere ideas de fiestas temáticas de superhéroes basadas en una categoría dada. De esta manera, Alfred puede encontrar el tema de fiesta perfecto para impresionar a sus invitados.
 
 ```python
-from smolagents import Tool, CodeAgent, HfApiModel
+from smolagents import Tool, CodeAgent, InferenceClientModel
 
 class SuperheroPartyThemeTool(Tool):
     name = "superhero_party_theme_generator"
@@ -138,7 +138,7 @@ class SuperheroPartyThemeTool(Tool):
 
 # Instancia la herramienta
 party_theme_tool = SuperheroPartyThemeTool()
-agent = CodeAgent(tools=[party_theme_tool], model=HfApiModel())
+agent = CodeAgent(tools=[party_theme_tool], model=InferenceClientModel())
 
 # Ejecuta el agente para generar una idea de tema para la fiesta
 result = agent.run(
@@ -196,7 +196,7 @@ party_theme_tool.push_to_hub("{tu_nombre_de_usuario}/party_theme_tool", token="<
 Puedes importar fácilmente herramientas creadas por otros usuarios usando la función `load_tool()`. Por ejemplo, Alfred podría querer generar una imagen promocional para la fiesta usando IA. En lugar de construir una herramienta desde cero, puede aprovechar una predefinida de la comunidad:
 
 ```python
-from smolagents import load_tool, CodeAgent, HfApiModel
+from smolagents import load_tool, CodeAgent, InferenceClientModel
 
 image_generation_tool = load_tool(
     "m-ric/text-to-image",
@@ -205,7 +205,7 @@ image_generation_tool = load_tool(
 
 agent = CodeAgent(
     tools=[image_generation_tool],
-    model=HfApiModel()
+    model=InferenceClientModel()
 )
 
 agent.run("Genera una imagen de una lujosa fiesta temática de superhéroes en la Mansión Wayne con superhéroes inventados.")
@@ -220,7 +220,7 @@ La herramienta se conectará con el backend Gradio del space usando `gradio_clie
 Para la fiesta, Alfred puede usar un HF Space existente para la generación de la imagen generada por IA que se usará en el anuncio (en lugar de la herramienta preintegrada que mencionamos antes). ¡Vamos a construirla!
 
 ```python
-from smolagents import CodeAgent, HfApiModel, Tool
+from smolagents import CodeAgent, InferenceClientModel, Tool
 
 image_generation_tool = Tool.from_space(
     "black-forest-labs/FLUX.1-schnell",
@@ -228,7 +228,7 @@ image_generation_tool = Tool.from_space(
     description="Generar una imagen a partir de un prompt"
 )
 
-model = HfApiModel("Qwen/Qwen2.5-Coder-32B-Instruct")
+model = InferenceClientModel("Qwen/Qwen2.5-Coder-32B-Instruct")
 
 agent = CodeAgent(tools=[image_generation_tool], model=model)
 
@@ -250,7 +250,7 @@ Así es como lo hace:
 
 ```python
 from langchain.agents import load_tools
-from smolagents import CodeAgent, HfApiModel, Tool
+from smolagents import CodeAgent, InferenceClientModel, Tool
 
 search_tool = Tool.from_langchain(load_tools(["serpapi"])[0])
 

@@ -304,10 +304,10 @@ Ahora que tenemos todas las herramientas, vamos a integrarlas en el agente de Al
 <hfoption id="smolagents">
 
 ```python
-from smolagents import CodeAgent, HfApiModel
+from smolagents import CodeAgent, InferenceClientModel
 
 # Inicializar el modelo de Hugging Face
-model = HfApiModel()
+model = InferenceClientModel()
 
 # Crear Alfred con todas las herramientas
 alfred = CodeAgent(

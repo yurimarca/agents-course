@@ -98,12 +98,12 @@ Aquí hay un simple CodeAgent de smolagents que calcula `1+1`. Lo ejecutamos par
 
 
 ```python
-from smolagents import HfApiModel, CodeAgent
+from smolagents import InferenceClientModel, CodeAgent
 
 # Crear un agente simple para probar la instrumentación
 agent = CodeAgent(
     tools=[],
-    model=HfApiModel()
+    model=InferenceClientModel()
 )
 
 agent.run("1+1=")
@@ -123,10 +123,10 @@ Ahora que has confirmado que tu instrumentación funciona, probemos una consulta
 
 
 ```python
-from smolagents import (CodeAgent, DuckDuckGoSearchTool, HfApiModel)
+from smolagents import (CodeAgent, DuckDuckGoSearchTool, InferenceClientModel)
 
 search_tool = DuckDuckGoSearchTool()
-agent = CodeAgent(tools=[search_tool], model=HfApiModel())
+agent = CodeAgent(tools=[search_tool], model=InferenceClientModel())
 
 agent.run("¿Cuántos cubos de Rubik podrías meter dentro de la Catedral de Notre Dame?")
 ```
@@ -135,7 +135,7 @@ agent.run("¿Cuántos cubos de Rubik podrías meter dentro de la Catedral de Not
 
 La mayoría de las herramientas de observabilidad registran una **rastro** que contiene **spans**, que representan cada paso de la lógica de tu agente. Aquí, el rastro contiene la ejecución general del agente y sub-spans para:
 - Las llamadas a herramientas (DuckDuckGoSearchTool)
-- Las llamadas al LLM (HfApiModel)
+- Las llamadas al LLM (InferenceClientModel)
 
 Puedes inspeccionarlos para ver precisamente dónde se gasta el tiempo, cuántos tokens se utilizan, etc.:
 
@@ -178,13 +178,13 @@ También puedes pasar atributos adicionales, como IDs de usuario, IDs de sesión
 
 
 ```python
-from smolagents import (CodeAgent, DuckDuckGoSearchTool, HfApiModel)
+from smolagents import (CodeAgent, DuckDuckGoSearchTool, InferenceClientModel)
 from opentelemetry import trace
 
 search_tool = DuckDuckGoSearchTool()
 agent = CodeAgent(
     tools=[search_tool],
-    model=HfApiModel()
+    model=InferenceClientModel()
 )
 
 with tracer.start_as_current_span("Smolagent-Trace") as span:
@@ -207,11 +207,11 @@ En el fragmento de código a continuación, cuando un usuario envía un mensaje 
 ```python
 import gradio as gr
 from opentelemetry.trace import format_trace_id
-from smolagents import (CodeAgent, HfApiModel)
+from smolagents import (CodeAgent, InferenceClientModel)
 from langfuse import Langfuse
 
 langfuse = Langfuse()
-model = HfApiModel()
+model = InferenceClientModel()
 agent = CodeAgent(tools=[], model=model, add_base_tools=True)
 
 formatted_trace_id = None  # Almacenaremos el trace_id actual globalmente para demostración
@@ -284,10 +284,10 @@ Ejemplo de Langfuse:
 
 ```python
 # Ejemplo: Verificar si la salida del agente es tóxica o no.
-from smolagents import (CodeAgent, DuckDuckGoSearchTool, HfApiModel)
+from smolagents import (CodeAgent, DuckDuckGoSearchTool, InferenceClientModel)
 
 search_tool = DuckDuckGoSearchTool()
-agent = CodeAgent(tools=[search_tool], model=HfApiModel())
+agent = CodeAgent(tools=[search_tool], model=InferenceClientModel())
 
 agent.run("¿Puede comer zanahorias mejorar tu visión?")
 ```
@@ -374,10 +374,10 @@ Luego, recorremos cada elemento del conjunto de datos, ejecutamos el agente y vi
 
 ```python
 from opentelemetry.trace import format_trace_id
-from smolagents import (CodeAgent, HfApiModel, LiteLLMModel)
+from smolagents import (CodeAgent, InferenceClientModel, LiteLLMModel)
 
-# Ejemplo: usando HfApiModel o LiteLLMModel para acceder a modelos de openai, anthropic, gemini, etc.:
-model = HfApiModel()
+# Ejemplo: usando InferenceClientModel o LiteLLMModel para acceder a modelos de openai, anthropic, gemini, etc.:
+model = InferenceClientModel()
 
 agent = CodeAgent(
     tools=[],

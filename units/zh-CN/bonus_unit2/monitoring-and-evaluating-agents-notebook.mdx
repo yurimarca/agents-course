@@ -99,12 +99,12 @@ SmolagentsInstrumentor().instrument(tracer_provider=trace_provider)
 
 
 ```python
-from smolagents import HfApiModel, CodeAgent
+from smolagents import InferenceClientModel, CodeAgent
 
 # 创建一个简单的智能体来测试检测
 agent = CodeAgent(
     tools=[],
-    model=HfApiModel()
+    model=InferenceClientModel()
 )
 
 agent.run("1+1=")
@@ -124,10 +124,10 @@ _[追踪链接](https://cloud.langfuse.com/project/cloramnkj0002jz088vzn1ja4/tra
 
 
 ```python
-from smolagents import (CodeAgent, DuckDuckGoSearchTool, HfApiModel)
+from smolagents import (CodeAgent, DuckDuckGoSearchTool, InferenceClientModel)
 
 search_tool = DuckDuckGoSearchTool()
-agent = CodeAgent(tools=[search_tool], model=HfApiModel())
+agent = CodeAgent(tools=[search_tool], model=InferenceClientModel())
 
 agent.run("How many Rubik's Cubes could you fit inside the Notre Dame Cathedral?")
 ```
@@ -136,7 +136,7 @@ agent.run("How many Rubik's Cubes could you fit inside the Notre Dame Cathedral?
 
 大多数可观测性工具会记录一个**追踪（trace）**，其中包含**跨度（spans）**，每个跨度代表你的智能体逻辑的一个步骤。在这里，追踪包含了整体的智能体运行以及用于以下内容的子跨度：
 - 工具调用 (DuckDuckGoSearchTool)
-- LLM 调用 (HfApiModel)
+- LLM 调用 (InferenceClientModel)
 
 你可以检查这些跨度，以精确地了解时间花在哪里、使用了多少 token 等等：
 
@@ -181,13 +181,13 @@ _[前往追踪（trace）的链接](https://cloud.langfuse.com/project/cloramnkj
 
 
 ```python
-from smolagents import (CodeAgent, DuckDuckGoSearchTool, HfApiModel)
+from smolagents import (CodeAgent, DuckDuckGoSearchTool, InferenceClientModel)
 from opentelemetry import trace
 
 search_tool = DuckDuckGoSearchTool()
 agent = CodeAgent(
     tools=[search_tool],
-    model=HfApiModel()
+    model=InferenceClientModel()
 )
 
 with tracer.start_as_current_span("Smolagent-Trace") as span:
@@ -211,11 +211,11 @@ with tracer.start_as_current_span("Smolagent-Trace") as span:
 ```python
 import gradio as gr
 from opentelemetry.trace import format_trace_id
-from smolagents import (CodeAgent, HfApiModel)
+from smolagents import (CodeAgent, InferenceClientModel)
 from langfuse import Langfuse
 
 langfuse = Langfuse()
-model = HfApiModel()
+model = InferenceClientModel()
 agent = CodeAgent(tools=[], model=model, add_base_tools=True)
 
 formatted_trace_id = None  # 为演示目的，我们将在全局存储当前的 trace_id
@@ -289,10 +289,10 @@ LLM 作为评判者（LLM-as-a-Judge）是另一种自动评估你的智能体�
 
 ```python
 # 示例：检查智能体的输出是否有毒。
-from smolagents import (CodeAgent, DuckDuckGoSearchTool, HfApiModel)
+from smolagents import (CodeAgent, DuckDuckGoSearchTool, InferenceClientModel)
 
 search_tool = DuckDuckGoSearchTool()
-agent = CodeAgent(tools=[search_tool], model=HfApiModel())
+agent = CodeAgent(tools=[search_tool], model=InferenceClientModel())
 
 agent.run("Can eating carrots improve your vision?")
 
@@ -383,10 +383,10 @@ for idx, row in df.iterrows():
 
 ```python
 from opentelemetry.trace import format_trace_id
-from smolagents import (CodeAgent, HfApiModel, LiteLLMModel)
+from smolagents import (CodeAgent, InferenceClientModel, LiteLLMModel)
 
-# 示例：使用 HfApiModel 或 LiteLLMModel 访问 openai、anthropic、gemini 等模型：
-model = HfApiModel()
+# 示例：使用 InferenceClientModel 或 LiteLLMModel 访问 openai、anthropic、gemini 等模型：
+model = InferenceClientModel()
 
 agent = CodeAgent(
     tools=[],
