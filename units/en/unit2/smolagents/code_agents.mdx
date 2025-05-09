@@ -293,7 +293,8 @@ agent = CodeAgent(
         VisitWebpageTool(),
         suggest_menu,
         catering_service_tool,
-        SuperheroPartyThemeTool()
+        SuperheroPartyThemeTool(),
+	FinalAnswerTool()
     ], 
     model=InferenceClientModel(),
     max_steps=10,
